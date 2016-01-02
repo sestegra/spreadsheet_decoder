@@ -1,7 +1,19 @@
-import 'dart:io';
-import 'package:spreadsheet/spreadsheet.dart';
+part of spreadsheet_test;
 
-SpreadsheetDecoder decode(String filename) {
-  var fullUri = new Uri.file('test/files/$filename');
-  return new SpreadsheetDecoder.decodeBytes(new File.fromUri(fullUri).readAsBytesSync());
+testXlsx() {
+  group('xlsx spreadsheet', () {
+    test('Check format', () async {
+      var decoder = await decode('default.xlsx');
+      expect(decoder is XlsxDecoder, isTrue);
+    });
+  });
+}
+
+testOds() {
+  group('ods spreadsheet', () {
+    test('Check format', () async {
+      var decoder = await decode('default.ods');
+      expect(decoder is OdsDecoder, isTrue);
+    });
+  });
 }
