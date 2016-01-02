@@ -1,6 +1,6 @@
 # Spreadsheet
  
-Spreadsheet is a library for reading spreadsheets as ODS and XLSX files.
+Spreadsheet is a library in dart language for reading spreadsheets for ODS and XLSX files.
 
 ## Usage
 
