@@ -23,3 +23,6 @@ doc/api/
 # Unzipped directories (for debug)
 *_ods/
 *_xlsx/
+
+# LibreOffice locks
+.~lock.*#

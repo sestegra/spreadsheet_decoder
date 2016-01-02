@@ -21,78 +21,56 @@ class OdsDecoder extends SpreadsheetDecoder {
     var content = _archive.findFile('content.xml');
     content.decompress();
     var document = parse(UTF8.decode(content.content));
-    document.findAllElements("table:table").forEach((node) {
+    document.findAllElements('table:table').forEach((node) {
       _parseTable(node);
     });
   }
 
   _parseTable(XmlElement node) {
-    var name = node.getAttribute("table:name");
+    var name = node.getAttribute('table:name');
     tables[name] = new SpreadsheetTable();
-    ;
     var table = tables[name];
 
-    node.findElements("table:table-row").forEach((child) {
+    node.findElements('table:table-row').forEach((child) {
       _parseRow(child, table);
     });
 
-    // Truncate rows only
-    if (table._maxRows == -1) {
-      table._rows.clear();
-    } else if (table._maxRows < table._rows.length) {
-      table._rows.removeRange(table._maxRows, table._rows.length);
-    }
-    for (var row = 0; row < table._rows.length; row++) {
-      if (table._maxCols == -1) {
-        table._rows[row].clear();
-      } else if (table._maxCols < table._rows[row].length) {
-        table._rows[row].removeRange(table._maxCols, table._rows[row].length);
-      }
-    }
+    _normalizeTable(table);
   }
 
   _parseRow(XmlElement node, SpreadsheetTable table) {
     var row = new List();
 
-    node.findElements("table:table-cell").forEach((child) {
+    node.findElements('table:table-cell').forEach((child) {
       _parseCell(child, table, row);
     });
 
-    var repeat = (node.getAttribute("table:number-rows-repeated") != null)
-        ? int.parse(node.getAttribute("table:number-rows-repeated"))
+    var repeat = (node.getAttribute('table:number-rows-repeated') != null)
+        ? int.parse(node.getAttribute('table:number-rows-repeated'))
         : 1;
     for (var index = 0; index < repeat; index++) {
       table._rows.add(row);
     }
 
-    // If row not empty
-    if (!row.fold(true, (value, element) => value && (element == null))) {
-      if (table._maxRows < table._rows.length) {
-        table._maxRows = table._rows.length;
-      }
-    }
+    _countFilledRow(table, row);
   }
 
   _parseCell(XmlElement node, SpreadsheetTable table, List row) {
     var list = new List<String>();
 
-    node.findElements("text:p").forEach((child) {
+    node.findElements('text:p').forEach((child) {
       list.add(_parseValue(child));
     });
 
-    var text = (list.isNotEmpty) ? list.join(r'\n').trim() : null;
-    var repeat = (node.getAttribute("table:number-columns-repeated") != null)
-        ? int.parse(node.getAttribute("table:number-columns-repeated"))
+    var text = (list.isNotEmpty) ? list.join('\n').trim() : null;
+    var repeat = (node.getAttribute('table:number-columns-repeated') != null)
+        ? int.parse(node.getAttribute('table:number-columns-repeated'))
         : 1;
     for (var index = 0; index < repeat; index++) {
       row.add(text);
     }
 
-    if (text != null) {
-      if (table._maxCols < row.length) {
-        table._maxCols = row.length;
-      }
-    }
+    _countFilledColumn(table, row, text);
   }
 
   _parseValue(XmlElement node) {

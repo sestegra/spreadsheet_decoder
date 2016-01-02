@@ -7,6 +7,8 @@ final Map<String, String> _spreasheetExtensionMap = <String, String>{
   _spreasheetXlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 };
 
+final _emptyRow = new List();
+
 // HTML entities to decode (see here http://books.evc-cit.info/apa.php)
 String _unescape(String text) {
   return text
@@ -30,9 +32,9 @@ SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive) {
       format = _spreasheetOds;
     }
 
-    // Try OpenXml Office format
+  // Try OpenXml Office format
   } else {
-    var xl = archive.findFile('xl/');
+    var xl = archive.findFile('xl/workbook.xml');
     format = xl != null ? _spreasheetXlsx : null;
   }
 
@@ -64,6 +66,50 @@ abstract class SpreadsheetDecoder {
   factory SpreadsheetDecoder.decodeBuffer(InputStream input, {bool verify: false}) {
     var archive = new ZipDecoder().decodeBuffer(input, verify: verify);
     return _newSpreadsheetDecoder(archive);
+  }
+
+  _normalizeTable(SpreadsheetTable table) {
+    if (table._maxRows == -1) {
+      table._rows.clear();
+    } else if (table._maxRows < table._rows.length) {
+      table._rows.removeRange(table._maxRows, table._rows.length);
+    }
+    for (var row = 0; row < table._rows.length; row++) {
+      if (table._maxCols == -1) {
+        table._rows[row].clear();
+      } else if (table._maxCols < table._rows[row].length) {
+        table._rows[row].removeRange(table._maxCols, table._rows[row].length);
+      } else if (table._maxCols > table._rows[row].length) {
+        var repeat = table._maxCols - table._rows[row].length;
+        for (var index = 0; index < repeat; index++) {
+          table._rows[row].add(null);
+        }
+      }
+    }
+  }
+
+  bool _isEmptyRow(List row) {
+    return row.fold(true, (value, element) => value && (element == null));
+  }
+
+  bool _isNotEmptyRow(List row) {
+    return !_isEmptyRow(row);
+  }
+
+  _countFilledRow(SpreadsheetTable table, List row) {
+    if (_isNotEmptyRow(row)) {
+      if (table._maxRows < table._rows.length) {
+        table._maxRows = table._rows.length;
+      }
+    }
+  }
+
+  _countFilledColumn(SpreadsheetTable table, List row, String text) {
+    if (text != null) {
+      if (table._maxCols < row.length) {
+        table._maxCols = row.length;
+      }
+    }
   }
 }
 

@@ -15,7 +15,7 @@ A simple usage example:
     }
 
 ## Not yet supported
-ODS decoder implementation doesn't support following features
+This implementation doesn't support following features:
 - annotations
 - spanned rows
 - spanned columns
