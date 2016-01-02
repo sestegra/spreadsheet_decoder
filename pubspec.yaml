@@ -1,6 +1,6 @@
 name: spreadsheet
 description: Spreadsheet files decoder
-version: 0.0.1
+version: 0.1.0
 authors:
 - Stéphane Este-Gracias <sestegra@gmail.com>
 homepage: https://github.com/sestegra/xlsx

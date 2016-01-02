@@ -8,5 +8,6 @@ class XlsxDecoder extends SpreadsheetDecoder {
 
   XlsxDecoder(Archive archive) {
     this._archive = archive;
+    _tables = new Map<String, SpreadsheetTable>();
   }
 }

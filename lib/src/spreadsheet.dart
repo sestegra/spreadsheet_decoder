@@ -7,6 +7,16 @@ final Map<String, String> _spreasheetExtensionMap = <String, String>{
   _spreasheetXlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 };
 
+// HTML entities to decode (see here http://books.evc-cit.info/apa.php)
+String _unescape(String text) {
+  return text
+      .replaceAll("&quot;", '"')
+      .replaceAll("&apos;", "'")
+      .replaceAll("&amp;", "&")
+      .replaceAll("&lt;", "<")
+      .replaceAll("&gt;", ">");
+}
+
 SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive) {
   // Lookup at file format
   var format;
@@ -58,11 +68,11 @@ abstract class SpreadsheetDecoder {
 }
 
 class SpreadsheetTable {
-  int _rows;
-  int _cols;
-  int _maxRows;
-  int _maxCols;
+  int _rows; // TODO Remove _rows ???
+  int _cols; // TODO Remove _cols ???
+  int _maxRows = -1;
+  int _maxCols = -1;
 
-  List<List> _table;
-  List<List> get table => _table;
+  List<List> _table = new List<List>();
+  List<List> get rows => _table;
 }

@@ -14,8 +14,13 @@ A simple usage example:
       var spreadsheetDecoder = new SpreadsheetDecoder.decodeBytes(bytes);
     }
 
-## Features and bugs
-Please file feature requests and bugs at the [issue tracker](tracker).
+## Not yet supported
+ODS decoder implementation doesn't support following features
+- annotations
+- spanned rows
+- spanned columns
+- hidden rows (visible in resulting table)
+- hidden columns (visible in resulting table)
 
 ## License
 Please see the [license file](LICENSE).
