@@ -4,23 +4,38 @@ Spreadsheet is a library in dart language for reading spreadsheets for ODS and X
 
 ## Usage
 
-A simple usage example:
+### On server-side
 
     import 'dart:io';
     import 'package:spreadsheet/spreadsheet.dart';
 
     main() {
       var bytes = new File.fromUri(fullUri).readAsBytesSync();
-      var spreadsheetDecoder = new SpreadsheetDecoder.decodeBytes(bytes);
+      var decoder = new SpreadsheetDecoder.decodeBytes(bytes);
+      var table = decoder.tables['Sheet1'];
+      var values = table.rows[0];
+      ...
     }
 
-## Not yet supported
+### On client-side
+
+    import 'dart:html';
+    import 'package:spreadsheet/spreadsheet.dart';
+
+    main() {
+      var reader = new FileReader();
+      reader.onLoadEnd.listen((event) {
+        var decoder = new SpreadsheetDecoder.decodeBytes(reader.result);
+        var table = decoder.tables['Sheet1'];
+        var values = table.rows[0];
+        ...
+      });
+    }
+
+## Features not yet supported
 This implementation doesn't support following features:
 - annotations
 - spanned rows
 - spanned columns
-- hidden rows (visible in resulting table)
-- hidden columns (visible in resulting table)
-
-## License
-Please see the [license file](LICENSE).
+- hidden rows (visible in resulting tables)
+- hidden columns (visible in resulting tables)

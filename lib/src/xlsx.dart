@@ -35,8 +35,8 @@ int _intOnly(int rune) {
   return 0;
 }
 
-// Returns the zero based cartesian coordinates from a cell name
-// "A1" returns [1, 1] and the "B3" return [2, 3]
+/// Returns the coordinates from a cell name.
+/// "A1" returns [1, 1] and the "B3" return [2, 3].
 List cellCoordsFromCellId(String cellId) {
   var letters = cellId.runes.map(_letterOnly);
   var lettersPart = UTF8.decode(letters.where((rune) => rune > 0).toList(growable: false));

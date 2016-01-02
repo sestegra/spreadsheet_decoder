@@ -49,11 +49,12 @@ SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive) {
 }
 
 /**
- * Decode a spreasheet file.
+ * Decode a spreadsheet file.
  */
 abstract class SpreadsheetDecoder {
   Archive _archive;
   Map<String, SpreadsheetTable> _tables;
+  /// Tables contained in spreadsheet file indexed by their names
   Map<String, SpreadsheetTable> get tables => _tables;
 
   SpreadsheetDecoder();
@@ -113,10 +114,12 @@ abstract class SpreadsheetDecoder {
   }
 }
 
+/// Table of a spreadsheet file
 class SpreadsheetTable {
   int _maxRows = -1;
   int _maxCols = -1;
 
   List<List> _rows = new List<List>();
+  /// List of table's rows
   List<List> get rows => _rows;
 }
