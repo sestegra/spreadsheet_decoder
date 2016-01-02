@@ -33,7 +33,7 @@ var expectedTest = {
 
 var expectedPerl = {
   "Sheet1": [
-    ['-\$1,500.99', '17', null],
+    ['-1500.99', '17', null],
     [null, null, null],
     ['one', 'more', 'cell']
   ],

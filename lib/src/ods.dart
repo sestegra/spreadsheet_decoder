@@ -58,9 +58,16 @@ class OdsDecoder extends SpreadsheetDecoder {
   _parseCell(XmlElement node, SpreadsheetTable table, List row) {
     var list = new List<String>();
 
-    node.findElements('text:p').forEach((child) {
-      list.add(_parseValue(child));
-    });
+    // Numeric content in table cells
+    // http://books.evc-cit.info/odbook/ch05.html
+    var value = node.getAttribute('office:value');
+    if (value != null) {
+      list.add(value);
+    } else {
+      node.findElements('text:p').forEach((child) {
+        list.add(_parseValue(child));
+      });
+    }
 
     var text = (list.isNotEmpty) ? list.join('\n').trim() : null;
     var repeat = (node.getAttribute('table:number-columns-repeated') != null)
