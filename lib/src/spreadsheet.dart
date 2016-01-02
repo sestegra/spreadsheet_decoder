@@ -68,11 +68,9 @@ abstract class SpreadsheetDecoder {
 }
 
 class SpreadsheetTable {
-  int _rows; // TODO Remove _rows ???
-  int _cols; // TODO Remove _cols ???
   int _maxRows = -1;
   int _maxCols = -1;
 
-  List<List> _table = new List<List>();
-  List<List> get rows => _table;
+  List<List> _rows = new List<List>();
+  List<List> get rows => _rows;
 }

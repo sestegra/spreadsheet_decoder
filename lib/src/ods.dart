@@ -32,22 +32,21 @@ class OdsDecoder extends SpreadsheetDecoder {
     ;
     var table = tables[name];
 
-    table._rows = 0;
     node.findElements("table:table-row").forEach((child) {
       _parseRow(child, table);
     });
 
     // Truncate rows only
     if (table._maxRows == -1) {
-      table.rows.clear();
-    } else if (table._maxRows < table.rows.length) {
-      table.rows.removeRange(table._maxRows, table.rows.length);
+      table._rows.clear();
+    } else if (table._maxRows < table._rows.length) {
+      table._rows.removeRange(table._maxRows, table._rows.length);
     }
-    for (var row = 0; row < table.rows.length; row++) {
+    for (var row = 0; row < table._rows.length; row++) {
       if (table._maxCols == -1) {
-        table.rows[row].clear();
-      } else if (table._maxCols < table.rows[row].length) {
-        table.rows[row].removeRange(table._maxCols, table.rows[row].length);
+        table._rows[row].clear();
+      } else if (table._maxCols < table._rows[row].length) {
+        table._rows[row].removeRange(table._maxCols, table._rows[row].length);
       }
     }
   }
@@ -55,7 +54,6 @@ class OdsDecoder extends SpreadsheetDecoder {
   _parseRow(XmlElement node, SpreadsheetTable table) {
     var row = new List();
 
-    table._cols = 0;
     node.findElements("table:table-cell").forEach((child) {
       _parseCell(child, table, row);
     });
@@ -64,14 +62,13 @@ class OdsDecoder extends SpreadsheetDecoder {
         ? int.parse(node.getAttribute("table:number-rows-repeated"))
         : 1;
     for (var index = 0; index < repeat; index++) {
-      table.rows.add(row);
-      table._rows++;
+      table._rows.add(row);
     }
 
     // If row not empty
     if (!row.fold(true, (value, element) => value && (element == null))) {
-      if (table._maxRows < table._rows) {
-        table._maxRows = table._rows;
+      if (table._maxRows < table._rows.length) {
+        table._maxRows = table._rows.length;
       }
     }
   }
@@ -89,12 +86,11 @@ class OdsDecoder extends SpreadsheetDecoder {
         : 1;
     for (var index = 0; index < repeat; index++) {
       row.add(text);
-      table._cols++;
     }
 
     if (text != null) {
-      if (table._maxCols < table._cols) {
-        table._maxCols = table._cols;
+      if (table._maxCols < row.length) {
+        table._maxCols = row.length;
       }
     }
   }
