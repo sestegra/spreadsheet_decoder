@@ -1,0 +1,13 @@
+name: spreadsheet
+description: Spreadsheet files decoder
+version: 0.0.1
+authors:
+- Stéphane Este-Gracias <sestegra@gmail.com>
+homepage: https://github.com/sestegra/xlsx
+environment:
+  sdk: '^1.13.0'
+dependencies:
+  archive: '^1.0.20'
+  xml: '^2.4.0'
+dev_dependencies:
+  test: '^0.12.0'
