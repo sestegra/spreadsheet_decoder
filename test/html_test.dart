@@ -2,7 +2,7 @@
 
 library spreadsheet_test;
 
-import 'package:spreadsheet/spreadsheet_decoder.dart';
+import 'package:spreadsheet_decoder/spreadsheet_decoder.dart';
 import 'package:test/test.dart';
 
 import 'common_html.dart';

@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:spreadsheet/spreadsheet_decoder.dart';
+import 'package:spreadsheet_decoder/spreadsheet_decoder.dart';
 
 final Map<String,String> files = {
   'unsupported.zip': 'UEsDBAoAAAAAAEEOI0gAAAAAAAAAAAAAAAAFABwAZW1wdHlVVAkAAzlwiFY5cIhWdXgLAAEE9QEAAAQUAAAAUEsBAh4DCgAAAAAAQQ4jSAAAAAAAAAAAAAAAAAUAGAAAAAAAAAAAAKSBAAAAAGVtcHR5VVQFAAM5cIhWdXgLAAEE9QEAAAQUAAAAUEsFBgAAAAABAAEASwAAAD8AAAAAAA==',

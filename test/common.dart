@@ -57,7 +57,7 @@ var expectedPerl = {
 };
 
 testUnsupported() {
-  test('Unsupported file:', () {
+  test('Unsupported file', () {
     var decoder;
     try {
       decoder = decode('unsupported.zip');
