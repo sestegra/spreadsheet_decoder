@@ -1,16 +1,16 @@
-# Spreadsheet
+# Spreadsheet Decoder
 
-[![Build Status](https://travis-ci.org/sestegra/spreadsheet.svg)](https://travis-ci.org/sestegra/spreadsheet?branch=master)
-[![Coverage Status](https://coveralls.io/repos/sestegra/spreadsheet/badge.svg?branch=master)](https://coveralls.io/r/sestegra/spreadsheet?branch=master)
+[![Build Status](https://travis-ci.org/sestegra/spreadsheet_decoder.svg)](https://travis-ci.org/sestegra/spreadsheet_decoder?branch=master)
+[![Coverage Status](https://coveralls.io/repos/sestegra/spreadsheet_decoder/badge.svg?branch=master)](https://coveralls.io/r/sestegra/spreadsheet_decoder?branch=master)
 
-Spreadsheet is a library in dart language for reading spreadsheets for ODS and XLSX files.
+Spreadsheet Decoder is a library for decoding spreadsheets for ODS and XLSX files.
 
 ## Usage
 
 ### On server-side
 
     import 'dart:io';
-    import 'package:spreadsheet/spreadsheet.dart';
+    import 'package:spreadsheet_decoder/spreadsheet_decoder.dart';
 
     main() {
       var bytes = new File.fromUri(fullUri).readAsBytesSync();
@@ -23,7 +23,7 @@ Spreadsheet is a library in dart language for reading spreadsheets for ODS and X
 ### On client-side
 
     import 'dart:html';
-    import 'package:spreadsheet/spreadsheet.dart';
+    import 'package:spreadsheet_decoder/spreadsheet_decoder.dart';
 
     main() {
       var reader = new FileReader();

@@ -1,4 +1,4 @@
-part of spreadsheet;
+part of spreadsheet_decoder;
 
 /// Convert a character based column
 int lettersToNumeric(String letters) {

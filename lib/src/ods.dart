@@ -7,7 +7,7 @@
 //   - spanned columns
 //   - hidden rows (visible in resulting table)
 //   - hidden columns (visible in resulting table)
-part of spreadsheet;
+part of spreadsheet_decoder;
 
 /// Read and parse ODS spreadsheet
 class OdsDecoder extends SpreadsheetDecoder {

@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:spreadsheet/spreadsheet.dart';
+import 'package:spreadsheet/spreadsheet_decoder.dart';
 
 SpreadsheetDecoder decode(String filename) {
   var fullUri = new Uri.file('test/files/$filename');

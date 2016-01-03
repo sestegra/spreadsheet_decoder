@@ -1,4 +1,4 @@
-library spreadsheet;
+library spreadsheet_decoder;
 
 import 'dart:convert';
 

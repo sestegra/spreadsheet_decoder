@@ -1,9 +1,9 @@
-name: spreadsheet
+name: spreadsheet_decoder
 description: Spreadsheet files decoder
 version: 0.2.0
 authors:
 - Stéphane Este-Gracias <sestegra@gmail.com>
-homepage: https://github.com/sestegra/xlsx
+homepage: https://github.com/sestegra/spreadsheet
 environment:
   sdk: '>=1.13.0 <2.0.0'
 dependencies:

@@ -1,4 +1,4 @@
-part of spreadsheet;
+part of spreadsheet_decoder;
 
 const _spreasheetOds  = 'ods';
 const _spreasheetXlsx = 'xlsx';
