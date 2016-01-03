@@ -1,6 +1,7 @@
 # Spreadsheet
 
 [![Build Status](https://travis-ci.org/sestegra/spreadsheet.svg)](https://travis-ci.org/sestegra/spreadsheet?branch=master)
+[![Coverage Status](https://coveralls.io/repos/sestegra/spreadsheet/badge.svg?branch=master)](https://coveralls.io/r/sestegra/spreadsheet?branch=master)
 
 Spreadsheet is a library in dart language for reading spreadsheets for ODS and XLSX files.
 
