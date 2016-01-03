@@ -56,6 +56,18 @@ var expectedPerl = {
   ]
 };
 
+testUnsupported() {
+  test('Unsupported file:', () {
+    var decoder;
+    try {
+      decoder = decode('unsupported.zip');
+    } catch(e) {
+      expect(e, isUnsupportedError);
+    }
+    expect(decoder, isNull);
+  });
+}
+
 testXlsx() {
   group('lettersToNumeric:', () {
     test('Simple capital letter', () {
@@ -131,6 +143,7 @@ testXlsx() {
       expect(cellCoordsFromCellId('A1'), [1, 1]);
       expect(cellCoordsFromCellId('B3'), [2, 3]);
       expect(cellCoordsFromCellId('AMJ42'), [1024, 42]);
+      expect(cellCoordsFromCellId('aMj1337'), [1024, 1337]);
     });
   });
 

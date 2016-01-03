@@ -28,12 +28,13 @@ int _letterOnly(int rune) {
   return 0;
 }
 
-int _intOnly(int rune) {
-  if (rune >= 48 && rune < 58) {
-    return rune;
-  }
-  return 0;
-}
+// Not used
+//int _intOnly(int rune) {
+//  if (rune >= 48 && rune < 58) {
+//    return rune;
+//  }
+//  return 0;
+//}
 
 /// Returns the coordinates from a cell name.
 /// "A1" returns [1, 1] and the "B3" return [2, 3].

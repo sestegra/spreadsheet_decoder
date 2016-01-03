@@ -9,6 +9,7 @@ import 'common_io.dart';
 part 'common.dart';
 
 void main() {
+  testUnsupported();
   testOds();
   testXlsx();
 }
