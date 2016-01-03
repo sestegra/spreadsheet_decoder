@@ -105,8 +105,8 @@ abstract class SpreadsheetDecoder {
     }
   }
 
-  _countFilledColumn(SpreadsheetTable table, List row, String text) {
-    if (text != null) {
+  _countFilledColumn(SpreadsheetTable table, List row, dynamic value) {
+    if (value != null) {
       if (table._maxCols < row.length) {
         table._maxCols = row.length;
       }

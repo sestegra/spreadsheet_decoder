@@ -1,44 +1,44 @@
 part of spreadsheet_test;
 
 var expectedTest = {
-  "ONE": [
-    [  "A",   "B",   "C"],
-    [  "1",   "2",   "3"],
-    [  "4",   "5",   "6"],
-    [  "7",   "8",   "9"],
-    [ "12",  "15",  "18"],
-    [  "3",   "3",   "3"],
-    [  "3",   "3",   "3"],
-    [  "3",   "3",   "3"],
+  'ONE': [
+    [  'A',   'B',   'C'],
+    [  1,   2,   3],
+    [  4,   5,   6],
+    [  7,   8,   9],
+    [ 12,  15,  18],
+    [  3,   3,   3],
+    [  3,   3,   3],
+    [  3,   3,   3],
     [ null,  null,  null],
-    [  "6",   "7",   "8"],
-    [  "6",   "7",   "8"],
-    [  "6",   "7",   "8"]
+    [  6,   7,   8],
+    [  6,   7,   8],
+    [  6,   7,   8]
   ],
-  "TWO": [
-    [  "X",   "Y",   "Z"],
-    [ "10",  "11",  "12"],
-    [ "13",  null,  "15"],
-    [ "16",  "17",  "18"],
-    ["&é'(§è!çà)-", '"«A»"', "<>"]
+  'TWO': [
+    [  'X',   'Y',   'Z'],
+    [ 10,  11,   12],
+    [ 13,  null, 15],
+    [ 16,  17,   18],
+    ["&é'(§è!çà)-", ' "«A»"', '<>']
   ],
-  "THREE": [
-    [  "P",   "Q",   "R"],
-    ["100", "101", "102"],
-    ["103", "104", "105"],
-    ["106", "107", "108"],
-    ["A", "B\nC", "D\nE\nF"]],
-  "EMPTY": []
+  'THREE': [
+    [  'P', 'Q', 'R'],
+    [  100, 101, 102],
+    [  103, 104, 105],
+    [  106, 107, 108],
+    ['A', 'B\nC', 'D\nE\nF']],
+  'EMPTY': []
 };
 
 var expectedPerl = {
-  "Sheet1": [
-    ['-1500.99', '17', null],
+  'Sheet1': [
+    [-1500.99, 17, null],
     [null, null, null],
     ['one', 'more', 'cell']
   ],
-  "Sheet2": [],
-  "Sheet3": [
+  'Sheet2': [],
+  'Sheet3': [
     ['Both alike', 'Both alike', null],
     [null, null, null],
     [null, null, null],
@@ -54,6 +54,24 @@ var expectedPerl = {
     [null, null, null],
     [null, null, 'Cell C14']
   ]
+};
+
+var expectedFormat = {
+  'Sheet1': [[
+    1337,
+    1337.42,
+    1234.56,
+    true,
+    'Hello World',
+    'One line\nTwo lines\nThree lines',
+    0.124,
+    '2006-01-02T00:00:00.000',
+    '2006-01-02T13:37:00.000',
+    '2006-01-02T13:37:42.000',
+    '13:37:00',
+    '13:37:42',
+    '13:37:42.2'
+  ]]
 };
 
 testUnsupported() {
@@ -176,6 +194,14 @@ testXlsx() {
         expect(table.rows, expectedPerl[name]);
       });
     });
+
+    test('Format file:', () {
+      var decoder = decode('format.xlsx');
+      expect(decoder.tables.length, expectedFormat.keys.length);
+      decoder.tables.forEach((name, table) {
+        expect(table.rows, expectedFormat[name]);
+      });
+    }, skip: 'Excel number could be a date');
   });
 }
 
@@ -195,6 +221,8 @@ testOds() {
     test('Test file', () {
       var decoder = decode('test.ods');
       expect(decoder.tables.length, expectedTest.keys.length);
+      var x = expectedTest['TWO'][4][1];
+      var y = decoder.tables['TWO'].rows[4][1];
       decoder.tables.forEach((name, table) {
         expect(table.rows, expectedTest[name]);
       });
@@ -205,6 +233,14 @@ testOds() {
       expect(decoder.tables.length, expectedPerl.keys.length);
       decoder.tables.forEach((name, table) {
         expect(table.rows, expectedPerl[name]);
+      });
+    });
+
+    test('Format file:', () {
+      var decoder = decode('format.ods');
+      expect(decoder.tables.length, expectedFormat.keys.length);
+      decoder.tables.forEach((name, table) {
+        expect(table.rows, expectedFormat[name]);
       });
     });
   });

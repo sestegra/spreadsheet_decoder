@@ -50,12 +50,36 @@ List cellCoordsFromCellId(String cellId) {
 /// Read and parse XSLX spreadsheet
 class XlsxDecoder extends SpreadsheetDecoder {
   List<String> _sharedStrings = new List<String>();
+  List<String> _numFormats = new List<String>();
 
   XlsxDecoder(Archive archive) {
     this._archive = archive;
     _tables = new Map<String, SpreadsheetTable>();
+    _parseStyles();
     _parseSharedStrings();
     _parseContent();
+  }
+
+  _parseStyles() {
+    var styles = _archive.findFile('xl/styles.xml');
+    if (styles != null) {
+      styles.decompress();
+      var document = parse(UTF8.decode(styles.content));
+      var numFmts = new Map<String,String>();
+      var nodes = document.findAllElements('numFmts');
+      if (nodes.isNotEmpty) {
+        nodes.first.children.forEach((node) {
+          var numFmtId   = node.getAttribute('numFmtId');
+          var formatCode = node.getAttribute('formatCode');
+          numFmts[numFmtId] = formatCode;
+        });
+      }
+
+      document.findAllElements('cellXfs').first.findElements('xf').forEach((node) {
+        var numFmtId = node.getAttribute('numFmtId');
+        _numFormats.add(numFmts[numFmtId]);
+      });
+    }
   }
 
   _parseSharedStrings() {
@@ -128,8 +152,6 @@ class XlsxDecoder extends SpreadsheetDecoder {
   }
 
   _parseCell(XmlElement node, SpreadsheetTable table, List row) {
-    var list = new List<String>();
-
     var coords = cellCoordsFromCellId(node.getAttribute('r'));
     var colNumber = coords[0] - 1;
     if (colNumber > row.length) {
@@ -139,28 +161,37 @@ class XlsxDecoder extends SpreadsheetDecoder {
       }
     }
 
-    node.findElements('v').forEach((child) {
-      var type = node.getAttribute('t');
-      if (type == 's') {
-        list.add(_sharedStrings[int.parse(_parseValue(child))]);
-      } else {
-        list.add(_parseValue(child));
-      }
-    });
+    var value;
+    var type = node.getAttribute('t');
+    var content = node.findElements('v').first;
+    switch (type) {
+      // sharedString
+      case 's':
+        value = _sharedStrings[int.parse(_parseValue(content))];
+        break;
+      // date
+      case 'd':
+        // TODO Implement date
+        break;
+      // boolean
+      case 'b':
+        value = _parseValue(content) == '1';
+        break;
+      // number
+      case 'n':
+      default:
+        value = num.parse(_parseValue(content));
+    }
+    row.add(value);
 
-    var text = (list.isNotEmpty) ? list.join('').trim() : null;
-    row.add(text);
-
-    _countFilledColumn(table, row, text);
+    _countFilledColumn(table, row, value);
   }
 
   _parseValue(XmlElement node) {
     var buffer = new StringBuffer();
 
     node.children.forEach((child) {
-      if (child is XmlElement) {
-        buffer.write(_unescape(_parseValue(child)));
-      } else if (child is XmlText) {
+      if (child is XmlText) {
         buffer.write(_unescape(child.text));
       }
     });

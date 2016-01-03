@@ -56,36 +56,51 @@ class OdsDecoder extends SpreadsheetDecoder {
   }
 
   _parseCell(XmlElement node, SpreadsheetTable table, List row) {
-    var list = new List<String>();
+    var value;
 
-    // Numeric content in table cells
-    // http://books.evc-cit.info/odbook/ch05.html
-    var value = node.getAttribute('office:value');
-    if (value != null) {
-      list.add(value);
-    } else {
-      node.findElements('text:p').forEach((child) {
-        list.add(_parseValue(child));
-      });
+    var type = node.getAttribute('office:value-type');
+    switch (type) {
+      case 'float':
+      case 'percentage':
+      case 'currency':
+        value = num.parse(node.getAttribute('office:value'));
+        break;
+      case 'boolean':
+        value = node.getAttribute('office:boolean-value').toLowerCase() == 'true';
+        break;
+      case 'date':
+        value = DateTime.parse(node.getAttribute('office:date-value')).toIso8601String();
+        break;
+      case 'time':
+        value = node.getAttribute('office:time-value');
+        value = value.substring(2, value.length - 1);
+        value = value.replaceAll(new RegExp('[H|M]'), ':');
+        break;
+      case 'string':
+      default:
+        var list = new List<String>();
+        node.findElements('text:p').forEach((child) {
+          list.add(_parseString(child));
+        });
+        value = (list.isNotEmpty) ? list.join('\n') : null;
     }
 
-    var text = (list.isNotEmpty) ? list.join('\n').trim() : null;
     var repeat = (node.getAttribute('table:number-columns-repeated') != null)
         ? int.parse(node.getAttribute('table:number-columns-repeated'))
         : 1;
     for (var index = 0; index < repeat; index++) {
-      row.add(text);
+      row.add(value);
     }
 
-    _countFilledColumn(table, row, text);
+    _countFilledColumn(table, row, value);
   }
 
-  _parseValue(XmlElement node) {
+  _parseString(XmlElement node) {
     var buffer = new StringBuffer();
 
     node.children.forEach((child) {
       if (child is XmlElement) {
-        buffer.write(_unescape(_parseValue(child)));
+        buffer.write(_unescape(_parseString(child)));
       } else if (child is XmlText) {
         buffer.write(_unescape(child.text));
       }
