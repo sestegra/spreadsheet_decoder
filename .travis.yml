@@ -3,3 +3,5 @@ dart:
   - stable
   - dev
 with_content_shell: true
+after_success:
+  - ./tool/coveralls.sh
