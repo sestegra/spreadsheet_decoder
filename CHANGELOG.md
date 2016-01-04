@@ -1,3 +1,6 @@
+## 0.3.0
+Output typed data (number, string, date, time, boolean)
+
 ## 0.2.0
 Add XLSX decoder
 

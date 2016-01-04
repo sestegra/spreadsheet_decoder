@@ -42,3 +42,6 @@ This implementation doesn't support following features:
 - spanned columns
 - hidden rows (visible in resulting tables)
 - hidden columns (visible in resulting tables)
+
+For XLSX format, this implementation only supports native Excel format for date, time and boolean type conversion.
+In other words, custom format for date, time, boolean aren't supported and then file exported from LibreOffice as well.
