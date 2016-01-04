@@ -10,13 +10,16 @@ final Map<String, String> _spreasheetExtensionMap = <String, String>{
 final _emptyRow = new List();
 
 // HTML entities to decode (see here http://books.evc-cit.info/apa.php)
+// Normalize new line
 String _unescape(String text) {
   return text
       .replaceAll("&quot;", '"')
       .replaceAll("&apos;", "'")
       .replaceAll("&amp;", "&")
       .replaceAll("&lt;", "<")
-      .replaceAll("&gt;", ">");
+      .replaceAll("&gt;", ">")
+      .replaceAll("\r\n", "\n");
+
 }
 
 SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive) {

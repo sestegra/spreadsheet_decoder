@@ -36,6 +36,23 @@ int _letterOnly(int rune) {
 //  return 0;
 //}
 
+String _twoDigits(int n) {
+  if (n >= 10) {
+    return "${n}";
+  }
+  return "0${n}";
+}
+
+String _threeDigits(int n) {
+  if (n >= 100) {
+    return "${n}";
+  }
+  if (n >= 10) {
+    return "0${n}";
+  }
+  return "00${n}";
+}
+
 /// Returns the coordinates from a cell name.
 /// "A1" returns [1, 1] and the "B3" return [2, 3].
 List cellCoordsFromCellId(String cellId) {
@@ -50,7 +67,7 @@ List cellCoordsFromCellId(String cellId) {
 /// Read and parse XSLX spreadsheet
 class XlsxDecoder extends SpreadsheetDecoder {
   List<String> _sharedStrings = new List<String>();
-  List<String> _numFormats = new List<String>();
+  List<int> _numFormats = new List<int>();
 
   XlsxDecoder(Archive archive) {
     this._archive = archive;
@@ -65,19 +82,13 @@ class XlsxDecoder extends SpreadsheetDecoder {
     if (styles != null) {
       styles.decompress();
       var document = parse(UTF8.decode(styles.content));
-      var numFmts = new Map<String,String>();
-      var nodes = document.findAllElements('numFmts');
-      if (nodes.isNotEmpty) {
-        nodes.first.children.forEach((node) {
-          var numFmtId   = node.getAttribute('numFmtId');
-          var formatCode = node.getAttribute('formatCode');
-          numFmts[numFmtId] = formatCode;
-        });
-      }
-
       document.findAllElements('cellXfs').first.findElements('xf').forEach((node) {
         var numFmtId = node.getAttribute('numFmtId');
-        _numFormats.add(numFmts[numFmtId]);
+        if (numFmtId != null) {
+          _numFormats.add(int.parse(numFmtId));
+        } else {
+          _numFormats.add(0);
+        }
       });
     }
   }
@@ -163,24 +174,48 @@ class XlsxDecoder extends SpreadsheetDecoder {
 
     var value;
     var type = node.getAttribute('t');
-    var content = node.findElements('v').first;
-    switch (type) {
-      // sharedString
-      case 's':
-        value = _sharedStrings[int.parse(_parseValue(content))];
-        break;
-      // date
-      case 'd':
-        // TODO Implement date
-        break;
-      // boolean
-      case 'b':
-        value = _parseValue(content) == '1';
-        break;
-      // number
-      case 'n':
-      default:
-        value = num.parse(_parseValue(content));
+    var valueNode = node.findElements('v');
+    if (valueNode.isNotEmpty) {
+      var content = valueNode.first;
+      switch (type) {
+        // sharedString
+        case 's':
+          value = _sharedStrings[int.parse(_parseValue(content))];
+          break;
+        // boolean
+        case 'b':
+          value = _parseValue(content) == '1';
+          break;
+        // number
+        case 'n':
+        default:
+          var s = node.getAttribute('s');
+          if (s != null) {
+            var fmtId = _numFormats[int.parse(s)];
+            // date
+            if (   ((fmtId >= 14) && (fmtId <= 17))
+                || (fmtId == 22)) {
+              var delta = num.parse(_parseValue(content)) * 24 * 3600 * 1000;
+              var date = new DateTime(1899, 12, 30);
+              value = date.add(new Duration(milliseconds: delta.toInt())).toIso8601String();
+            // time
+            } else if (   ((fmtId >= 18) && (fmtId <= 21))
+                       || ((fmtId >= 45) && (fmtId <= 47))) {
+              var delta = num.parse(_parseValue(content)) * 24 * 3600 * 1000;
+              var date = new DateTime(0);
+              date = date.add(new Duration(milliseconds: delta.toInt()));
+              value = "${_twoDigits(date.hour)}:${_twoDigits(date.minute)}:${_twoDigits(date.second)}";
+              if (date.millisecond > 0) {
+                value += ":${_twoDigits(date.second)}";
+              }
+            // number
+            } else {
+              value = num.parse(_parseValue(content));
+            }
+          } else {
+            value = num.parse(_parseValue(content));
+          }
+      }
     }
     row.add(value);
 

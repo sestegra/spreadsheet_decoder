@@ -65,12 +65,11 @@ var expectedFormat = {
     'Hello World',
     'One line\nTwo lines\nThree lines',
     0.124,
-    '2006-01-02T00:00:00.000',
-    '2006-01-02T13:37:00.000',
-    '2006-01-02T13:37:42.000',
+    '2006-02-01T00:00:00.000',
+    '2006-02-01T13:37:00.000',
+    '2006-02-01T13:37:42.000',
     '13:37:00',
     '13:37:42',
-    '13:37:42.2'
   ]]
 };
 
@@ -201,7 +200,7 @@ testXlsx() {
       decoder.tables.forEach((name, table) {
         expect(table.rows, expectedFormat[name]);
       });
-    }, skip: 'Excel number could be a date');
+    });
   });
 }
 
@@ -221,8 +220,6 @@ testOds() {
     test('Test file', () {
       var decoder = decode('test.ods');
       expect(decoder.tables.length, expectedTest.keys.length);
-      var x = expectedTest['TWO'][4][1];
-      var y = decoder.tables['TWO'].rows[4][1];
       decoder.tables.forEach((name, table) {
         expect(table.rows, expectedTest[name]);
       });
