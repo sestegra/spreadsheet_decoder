@@ -43,16 +43,6 @@ String _twoDigits(int n) {
   return "0${n}";
 }
 
-String _threeDigits(int n) {
-  if (n >= 100) {
-    return "${n}";
-  }
-  if (n >= 10) {
-    return "0${n}";
-  }
-  return "00${n}";
-}
-
 /// Returns the coordinates from a cell name.
 /// "A1" returns [1, 1] and the "B3" return [2, 3].
 List cellCoordsFromCellId(String cellId) {
@@ -205,9 +195,6 @@ class XlsxDecoder extends SpreadsheetDecoder {
               var date = new DateTime(0);
               date = date.add(new Duration(milliseconds: delta.toInt()));
               value = "${_twoDigits(date.hour)}:${_twoDigits(date.minute)}:${_twoDigits(date.second)}";
-              if (date.millisecond > 0) {
-                value += ":${_twoDigits(date.second)}";
-              }
             // number
             } else {
               value = num.parse(_parseValue(content));
