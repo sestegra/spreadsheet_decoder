@@ -1,6 +1,6 @@
 name: spreadsheet_decoder
 description: Spreadsheet files decoder
-version: 0.3.0
+version: 0.3.1
 authors:
 - Stéphane Este-Gracias <sestegra@gmail.com>
 homepage: https://github.com/sestegra/spreadsheet

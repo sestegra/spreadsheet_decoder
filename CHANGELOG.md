@@ -1,3 +1,6 @@
+## 0.3.1
+Fix misalignment of decoded value with empty columns
+
 ## 0.3.0
 Output typed data (number, string, date, time, boolean)
 
