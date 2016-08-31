@@ -176,6 +176,10 @@ class XlsxDecoder extends SpreadsheetDecoder {
         case 'b':
           value = _parseValue(content) == '1';
           break;
+        // string
+        case 'str':
+          value = _parseValue(content);
+          break;
         // number
         case 'n':
         default:
