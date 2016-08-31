@@ -156,7 +156,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
     var coords = cellCoordsFromCellId(node.getAttribute('r'));
     var colNumber = coords[0] - 1;
     if (colNumber > row.length) {
-      var repeat = colNumber - table._rows.length + 1;
+      var repeat = colNumber - row.length;
       for (var index = 0; index < repeat; index++) {
         row.add(null);
       }

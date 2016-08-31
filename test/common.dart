@@ -73,6 +73,14 @@ var expectedFormat = {
   ]]
 };
 
+var expectedEmptyColumn = {
+  'EMPTY': [
+    ['a1', null, 'c1'],
+    ['a2', null, 'c2'],
+    ['a3', null, 'c3']
+  ]
+};
+
 testUnsupported() {
   test('Unsupported file', () {
     var decoder;
@@ -201,6 +209,14 @@ testXlsx() {
         expect(table.rows, expectedFormat[name]);
       });
     });
+
+    test('Empty column file:', () {
+      var decoder = decode('empty_column.xlsx');
+      expect(decoder.tables.length, expectedEmptyColumn.keys.length);
+      decoder.tables.forEach((name, table) {
+        expect(table.rows, expectedEmptyColumn[name]);
+      });
+    });
   });
 }
 
@@ -238,6 +254,14 @@ testOds() {
       expect(decoder.tables.length, expectedFormat.keys.length);
       decoder.tables.forEach((name, table) {
         expect(table.rows, expectedFormat[name]);
+      });
+    });
+
+    test('Empty column file:', () {
+      var decoder = decode('empty_column.ods');
+      expect(decoder.tables.length, expectedEmptyColumn.keys.length);
+      decoder.tables.forEach((name, table) {
+        expect(table.rows, expectedEmptyColumn[name]);
       });
     });
   });
