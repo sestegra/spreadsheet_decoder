@@ -1,5 +1,10 @@
 part of spreadsheet_decoder;
 
+const String _relationships = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+const String _relationshipsStyles = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles";
+const String _relationshipsWorksheet = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet";
+const String _relationshipsSharedStrings = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings";
+
 /// Convert a character based column
 int lettersToNumeric(String letters) {
   var sum = 0;
@@ -58,17 +63,42 @@ List cellCoordsFromCellId(String cellId) {
 class XlsxDecoder extends SpreadsheetDecoder {
   List<String> _sharedStrings = new List<String>();
   List<int> _numFormats = new List<int>();
+  String _stylesTarget;
+  String _sharedStringsTarget;
+  Map<String,String> _worksheetTargets = new Map<String,String>();
 
   XlsxDecoder(Archive archive) {
     this._archive = archive;
     _tables = new Map<String, SpreadsheetTable>();
+    _parseRelations();
     _parseStyles();
     _parseSharedStrings();
     _parseContent();
   }
 
+  _parseRelations() {
+    var relations = _archive.findFile('xl/_rels/workbook.xml.rels');
+    if (relations != null) {
+      relations.decompress();
+      var document = parse(UTF8.decode(relations.content));
+      document.findAllElements('Relationship').forEach((node) {
+        switch (node.getAttribute('Type')) {
+          case _relationshipsStyles:
+            _stylesTarget = node.getAttribute('Target');
+            break;
+          case _relationshipsWorksheet:
+            _worksheetTargets[node.getAttribute('Id')] = node.getAttribute('Target');
+            break;
+          case _relationshipsSharedStrings:
+            _sharedStringsTarget = node.getAttribute('Target');
+            break;
+        }
+      });
+    }
+  }
+
   _parseStyles() {
-    var styles = _archive.findFile('xl/styles.xml');
+    var styles = _archive.findFile('xl/$_stylesTarget');
     if (styles != null) {
       styles.decompress();
       var document = parse(UTF8.decode(styles.content));
@@ -84,7 +114,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
   }
 
   _parseSharedStrings() {
-    var sharedStrings = _archive.findFile('xl/sharedStrings.xml');
+    var sharedStrings = _archive.findFile('xl/$_sharedStringsTarget');
     if (sharedStrings != null) {
       sharedStrings.decompress();
       var document = parse(UTF8.decode(sharedStrings.content));
@@ -113,11 +143,11 @@ class XlsxDecoder extends SpreadsheetDecoder {
 
   _parseTable(XmlElement node) {
     var name = node.getAttribute('name');
-    var id = node.getAttribute('r:id').substring(3,4);
+    var target = _worksheetTargets[node.getAttribute('id', namespace: _relationships)];
     tables[name] = new SpreadsheetTable();
     var table = tables[name];
 
-    var sheet = _archive.findFile('xl/worksheets/sheet$id.xml');
+    var sheet = _archive.findFile("xl/$target");
     sheet.decompress();
 
     var document = parse(UTF8.decode(sheet.content));
