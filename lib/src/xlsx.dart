@@ -113,7 +113,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
 
   _parseTable(XmlElement node) {
     var name = node.getAttribute('name');
-    var id = node.getAttribute('sheetId');
+    var id = node.getAttribute('r:id').substring(3,4);
     tables[name] = new SpreadsheetTable();
     var table = tables[name];
 
