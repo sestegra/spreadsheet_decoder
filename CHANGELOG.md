@@ -1,3 +1,7 @@
+## 0.3.2
+Fix string parsing on xlsx file
+Fix sheet target selection
+
 ## 0.3.1
 Fix misalignment of decoded value with empty columns
 
