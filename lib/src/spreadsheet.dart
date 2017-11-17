@@ -115,6 +115,35 @@ abstract class SpreadsheetDecoder {
       }
     }
   }
+
+  editColumn(String sheetName, String headerName, List elements){
+    if (_tables.containsKey(sheetName)){
+      var header = _tables[sheetName]._rows[0];
+      var columnIndex = -1;
+      var validHeader = false;
+
+      for (var tempHeader in header){
+        columnIndex ++;
+        if (tempHeader == headerName){
+          validHeader = true;
+          break;
+        }
+      }
+
+      if(!validHeader){
+        throw new Exception("Invalid header name");
+      }
+
+      var rowIndex = 1;
+      for (var row in elements){
+        _tables[sheetName]._rows[rowIndex][columnIndex] = row;
+        rowIndex ++;
+      }
+
+    }else{
+      throw new Exception("Invalid sheet name");
+    }
+  }
 }
 
 /// Table of a spreadsheet file
