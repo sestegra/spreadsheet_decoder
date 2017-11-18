@@ -83,6 +83,19 @@ class XlsxDecoder extends SpreadsheetDecoder {
     _parseContent();
   }
 
+  String dumpXmlContent([String sheet]) {
+    if (sheet == null) {
+      var buffer = new StringBuffer();
+      _sheets.forEach((name, document) {
+        buffer.writeln(name);
+        buffer.writeln(document.toXmlString(pretty: true));
+      });
+      return buffer.toString();
+    } else {
+      return _sheets[sheet].toXmlString(pretty: true);
+    }
+  }
+
   _parseRelations() {
     var relations = _archive.findFile('xl/_rels/workbook.xml.rels');
     if (relations != null) {

@@ -2,32 +2,33 @@ part of spreadsheet_test;
 
 var expectedTest = {
   'ONE': [
-    [  'A',   'B',   'C'],
-    [  1,   2,   3],
-    [  4,   5,   6],
-    [  7,   8,   9],
-    [ 12,  15,  18],
-    [  3,   3,   3],
-    [  3,   3,   3],
-    [  3,   3,   3],
-    [ null,  null,  null],
-    [  6,   7,   8],
-    [  6,   7,   8],
-    [  6,   7,   8]
+    ['A', 'B', 'C'],
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9],
+    [12, 15, 18],
+    [3, 3, 3],
+    [3, 3, 3],
+    [3, 3, 3],
+    [null, null, null],
+    [6, 7, 8],
+    [6, 7, 8],
+    [6, 7, 8]
   ],
   'TWO': [
-    [  'X',   'Y',   'Z'],
-    [ 10,  11,   12],
-    [ 13,  null, 15],
-    [ 16,  17,   18],
+    ['X', 'Y', 'Z'],
+    [10, 11, 12],
+    [13, null, 15],
+    [16, 17, 18],
     ["&é'(§è!çà)-", ' "«A»"', '<>']
   ],
   'THREE': [
-    [  'P', 'Q', 'R'],
-    [  100, 101, 102],
-    [  103, 104, 105],
-    [  106, 107, 108],
-    ['A', 'B\nC', 'D\nE\nF']],
+    ['P', 'Q', 'R'],
+    [100, 101, 102],
+    [103, 104, 105],
+    [106, 107, 108],
+    ['A', 'B\nC', 'D\nE\nF']
+  ],
   'EMPTY': []
 };
 
@@ -56,21 +57,48 @@ var expectedPerl = {
   ]
 };
 
+var expectedPerlAfterUpdate = {
+  'Sheet1': [
+    ["0x0", "1x0", "2x0"],
+    ["0x1", "1x1", "2x1"],
+    ["0x2", "1x2", "2x2"],
+  ],
+  'Sheet2': [],
+  'Sheet3': [
+    ['Both alike', 'Both alike', null],
+    [null, null, null],
+    [null, null, null],
+    [null, null, null],
+    [null, null, null],
+    [null, "Cell B6", null],
+    [null, null, null],
+    [null, null, null],
+    [null, null, null],
+    [null, null, null],
+    [null, null, null],
+    [null, null, null],
+    [null, null, null],
+    [null, null, 'Cell C14']
+  ]
+};
+
 var expectedFormat = {
-  'Sheet1': [[
-    1337,
-    1337.42,
-    1234.56,
-    true,
-    'Hello World',
-    'One line\nTwo lines\nThree lines',
-    0.124,
-    '2006-02-01T00:00:00.000',
-    '2006-02-01T13:37:00.000',
-    '2006-02-01T13:37:42.000',
-    '13:37:00',
-    '13:37:42',
-  ]]
+  'Sheet1': [
+    [
+      1337,
+      1337.42,
+      1234.56,
+      true,
+      'Hello World',
+      'One line\nTwo lines\nThree lines',
+      0.124,
+      '2006-02-01T00:00:00.000',
+      '2006-02-01T13:37:00.000',
+      '2006-02-01T13:37:42.000',
+      '13:37:00',
+      '13:37:42',
+    ]
+  ]
 };
 
 var expectedEmptyColumn = {
@@ -86,7 +114,7 @@ testUnsupported() {
     var decoder;
     try {
       decoder = decode('unsupported.zip');
-    } catch(e) {
+    } catch (e) {
       expect(e, isUnsupportedError);
     }
     expect(decoder, isNull);
@@ -391,6 +419,74 @@ testUpdateOds() {
         expect(decoder.tables.length, expectedEmptyColumn.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedEmptyColumn[name]);
+        });
+      });
+    });
+
+    group('Update', () {
+      test('Perl file #1', () {
+        var first = decode('perl.ods', update: true)
+          ..updateCell('Sheet1', 0, 0, "0x0")
+          ..updateCell('Sheet1', 1, 0, "1x0")
+          ..updateCell('Sheet1', 2, 0, "2x0")
+          ..updateCell('Sheet1', 0, 1, "0x1")
+          ..updateCell('Sheet1', 1, 1, "1x1")
+          ..updateCell('Sheet1', 2, 1, "2x1")
+          ..updateCell('Sheet1', 0, 2, "0x2")
+          ..updateCell('Sheet1', 1, 2, "1x2")
+          ..updateCell('Sheet1', 2, 2, "2x2")
+          ..updateCell('Sheet3', 1, 5, "Cell B6");
+        var data = first.encode();
+        save('test/out/update/perl.ods', data);
+
+        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        expect(decoder.tables.length, expectedPerlAfterUpdate.keys.length);
+        decoder.tables.forEach((name, table) {
+          expect(table.rows, expectedPerlAfterUpdate[name]);
+        });
+      });
+
+      test('Perl file #2', () {
+        var first = decode('perl.ods', update: true)
+          ..updateCell('Sheet1', 2, 0, "2x0")
+          ..updateCell('Sheet1', 1, 0, "1x0")
+          ..updateCell('Sheet1', 0, 0, "0x0")
+          ..updateCell('Sheet1', 2, 1, "2x1")
+          ..updateCell('Sheet1', 1, 1, "1x1")
+          ..updateCell('Sheet1', 0, 1, "0x1")
+          ..updateCell('Sheet1', 2, 2, "2x2")
+          ..updateCell('Sheet1', 1, 2, "1x2")
+          ..updateCell('Sheet1', 0, 2, "0x2")
+          ..updateCell('Sheet3', 1, 5, "Cell B6");
+        var data = first.encode();
+        save('test/out/update/perl.ods', data);
+
+        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        expect(decoder.tables.length, expectedPerlAfterUpdate.keys.length);
+        decoder.tables.forEach((name, table) {
+          expect(table.rows, expectedPerlAfterUpdate[name]);
+        });
+      });
+
+      test('Perl file #3', () {
+        var first = decode('perl.ods', update: true)
+          ..updateCell('Sheet1', 1, 0, "1x0")
+          ..updateCell('Sheet1', 2, 0, "2x0")
+          ..updateCell('Sheet1', 0, 0, "0x0")
+          ..updateCell('Sheet1', 1, 1, "1x1")
+          ..updateCell('Sheet1', 2, 1, "2x1")
+          ..updateCell('Sheet1', 0, 1, "0x1")
+          ..updateCell('Sheet1', 1, 2, "1x2")
+          ..updateCell('Sheet1', 2, 2, "2x2")
+          ..updateCell('Sheet1', 0, 2, "0x2")
+          ..updateCell('Sheet3', 1, 5, "Cell B6");
+        var data = first.encode();
+        save('test/out/update/perl.ods', data);
+
+        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        expect(decoder.tables.length, expectedPerlAfterUpdate.keys.length);
+        decoder.tables.forEach((name, table) {
+          expect(table.rows, expectedPerlAfterUpdate[name]);
         });
       });
     });

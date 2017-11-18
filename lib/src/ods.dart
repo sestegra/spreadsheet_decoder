@@ -9,6 +9,8 @@
 //   - hidden columns (visible in resulting table)
 part of spreadsheet_decoder;
 
+const String CONTENT_XML = 'content.xml';
+
 /// Read and parse ODS spreadsheet
 class OdsDecoder extends SpreadsheetDecoder {
   OdsDecoder(Archive archive, {bool update = false}) {
@@ -16,6 +18,14 @@ class OdsDecoder extends SpreadsheetDecoder {
     this._update = update;
     _tables = new Map<String, SpreadsheetTable>();
     _parseContent();
+  }
+
+  String dumpXmlContent([String sheet]) {
+    if (sheet == null) {
+      return _xmlFiles[CONTENT_XML].toXmlString(pretty: true);
+    } else {
+      return _sheets[sheet].toXmlString(pretty: true);
+    }
   }
 
   void updateCell(String sheet, int column, int row, dynamic value) {
@@ -35,19 +45,17 @@ class OdsDecoder extends SpreadsheetDecoder {
     foundRow.children
       ..removeAt(foundCellIndex)
       ..insert(foundCellIndex, _stringCell(data));
-
-    print(foundRow);
   }
 
   _parseContent() {
-    var file = _archive.findFile('content.xml');
+    var file = _archive.findFile(CONTENT_XML);
     file.decompress();
     var content = parse(UTF8.decode(file.content));
     if (_update == true) {
       _archiveFiles = <String, ArchiveFile>{};
       _sheets = <String, XmlNode>{};
       _xmlFiles = {
-        'content.xml': content,
+        CONTENT_XML: content,
       };
     }
     content.findAllElements('table:table').forEach((node) {
@@ -147,10 +155,22 @@ class OdsDecoder extends SpreadsheetDecoder {
         : 1;
   }
 
+  static int _removeRowRepeated(XmlElement row) {
+    var node = row.getAttributeNode('table:number-rows-repeated');
+    row.attributes.remove(node);
+    return int.parse(node.value);
+  }
+
   static int _getCellRepeated(XmlElement cell) {
     return (cell.getAttribute('table:number-columns-repeated') != null)
         ? int.parse(cell.getAttribute('table:number-columns-repeated'))
         : 1;
+  }
+
+  static int _removeCellRepeated(XmlElement cell) {
+    var node = cell.getAttributeNode('table:number-columns-repeated');
+    cell.attributes.remove(node);
+    return int.parse(node.value);
   }
 
   static XmlElement _findRowByIndex(XmlElement table, int index) {
@@ -167,8 +187,10 @@ class OdsDecoder extends SpreadsheetDecoder {
     }
 
     // Expand row if required
-    if (currentIndex != index) {
-      // TODO Expand repeated rows
+    var repeat = _getRowRepeated(row);
+    if (repeat != 1) {
+      var rows = _expandRepeatedRows(table, row);
+      row = rows[index - (currentIndex - repeat + 1)];
     }
 
     return row;
@@ -188,11 +210,45 @@ class OdsDecoder extends SpreadsheetDecoder {
     }
 
     // Expand cell if required
-    if (currentIndex != index) {
-      // TODO Expand repeated rows
+    var repeat = _getCellRepeated(cell);
+    if (repeat != 1) {
+      var cells = _expandRepeatedCells(row, cell);
+      cell = cells[index - (currentIndex - repeat + 1)];
     }
 
     return cell;
+  }
+
+  static List<XmlElement> _expandRepeatedRows(XmlElement table, XmlElement row) {
+    var repeat = _removeRowRepeated(row);
+    var index = table.children.indexOf(row);
+    var xml = row.toString();
+    var rows = <XmlElement>[];
+    for (var i = 0; i < repeat; i++) {
+      rows.add(parse(xml).document.root.children.first);
+    }
+
+    table.children
+      ..removeAt(index)
+      ..insertAll(index, rows);
+
+    return rows;
+  }
+
+  static List<XmlElement> _expandRepeatedCells(XmlElement row, XmlElement cell) {
+    var repeat = _removeCellRepeated(cell);
+    var index = row.children.indexOf(cell);
+    var xml = cell.toString();
+    var cells = <XmlElement>[];
+    for (var i = 0; i < repeat; i++) {
+      cells.add(parse(xml).document.root.children.first);
+    }
+
+    row.children
+      ..removeAt(index)
+      ..insertAll(index, cells);
+
+    return cells;
   }
 
   static XmlElement _stringCell(String value) {

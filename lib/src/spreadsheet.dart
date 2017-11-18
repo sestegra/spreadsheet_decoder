@@ -93,9 +93,13 @@ abstract class SpreadsheetDecoder {
     return _newSpreadsheetDecoder(archive, update);
   }
 
+  /// Dump XML content (for debug purpose)
+  String dumpXmlContent([String sheet]);
+
   /// Update the contents from [sheet] of the cell [column]x[row] with ndexes start from 0
   void updateCell(String sheet, int col, int row, dynamic value);
 
+  /// Encode bytes after update
   List<int> encode() {
     if (_update != true) {
       throw new ArgumentError("'update' should be set to 'true' on constructor");
@@ -120,8 +124,7 @@ abstract class SpreadsheetDecoder {
           var content = (file.content as Uint8List).toList();
           //var compress = file.compress;
           var compress = _noCompression.contains(file.name) ? false : true;
-          copy = new ArchiveFile(file.name, content.length, content)
-            ..compress = compress;
+          copy = new ArchiveFile(file.name, content.length, content)..compress = compress;
         }
         clone.addFile(copy);
       }

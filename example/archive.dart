@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:archive/archive.dart';
+import 'package:path/path.dart';
 
 Archive cloneArchive(Archive archive) {
   var clone = new Archive();
@@ -37,12 +38,11 @@ void main(List<String> args) {
       var zip = new ZipEncoder().encode(cloneArchive(archive));
       try {
         archive = new ZipDecoder().decodeBytes(zip, verify: true);
-        var file = new File("out/$input")
+        var file = new File("test/out/example/${basename(input)}")
           ..createSync(recursive: true)
           ..writeAsBytesSync(zip);
         unzip(file.path);
         binwalk(file.path);
-
       } catch (e) {
         print("$input: KO");
       }
