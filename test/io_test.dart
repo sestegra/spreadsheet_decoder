@@ -12,4 +12,6 @@ void main() {
   testUnsupported();
   testOds();
   testXlsx();
+  testUpdateOds();
+  testUpdateXlsx();
 }

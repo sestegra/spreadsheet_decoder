@@ -266,3 +266,133 @@ testOds() {
     });
   });
 }
+
+testUpdateXlsx() {
+  group('xlsx spreadsheet update:', () {
+    group('No update', () {
+      test('Empty file', () {
+        var first = decode('default.xlsx', update: true);
+        var data = first.encode();
+        save('test/out/no/default.xlsx', data);
+
+        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        expect(decoder.tables.length, 3);
+        expect(decoder.tables['Sheet1'].rows, []);
+        expect(decoder.tables['Sheet2'].rows, []);
+        expect(decoder.tables['Sheet3'].rows, []);
+      });
+
+      test('Test file', () {
+        var first = decode('test.xlsx', update: true);
+        var data = first.encode();
+        save('test/out/no/test.xlsx', data);
+
+        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        expect(decoder.tables.length, expectedTest.keys.length);
+        decoder.tables.forEach((name, table) {
+          expect(table.rows, expectedTest[name]);
+        });
+      });
+
+      test('Perl file', () {
+        var first = decode('perl.xlsx', update: true);
+        var data = first.encode();
+        save('test/out/no/perl.xlsx', data);
+
+        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        expect(decoder.tables.length, expectedPerl.keys.length);
+        decoder.tables.forEach((name, table) {
+          expect(table.rows, expectedPerl[name]);
+        });
+      });
+
+      test('Format file:', () {
+        var first = decode('format.xlsx', update: true);
+        var data = first.encode();
+        save('test/out/no/format.xlsx', data);
+
+        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        expect(decoder.tables.length, expectedFormat.keys.length);
+        decoder.tables.forEach((name, table) {
+          expect(table.rows, expectedFormat[name]);
+        });
+      });
+
+      test('Empty column file:', () {
+        var first = decode('empty_column.xlsx', update: true);
+        var data = first.encode();
+        save('test/out/no/empty_column.xlsx', data);
+
+        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        expect(decoder.tables.length, expectedEmptyColumn.keys.length);
+        decoder.tables.forEach((name, table) {
+          expect(table.rows, expectedEmptyColumn[name]);
+        });
+      });
+    });
+  });
+}
+
+testUpdateOds() {
+  group('ods spreadsheet update:', () {
+    group('No update', () {
+      test('Empty file', () {
+        var first = decode('default.ods', update: true);
+        var data = first.encode();
+        save('test/out/no/default.ods', data);
+
+        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        expect(decoder.tables.length, 1);
+        expect(decoder.tables['Sheet1'].rows, []);
+      });
+
+      test('Test file', () {
+        var first = decode('test.ods', update: true);
+        var data = first.encode();
+        save('test/out/no/test.ods', data);
+
+        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        expect(decoder.tables.length, expectedTest.keys.length);
+        decoder.tables.forEach((name, table) {
+          expect(table.rows, expectedTest[name]);
+        });
+      });
+
+      test('Perl file', () {
+        var first = decode('perl.ods', update: true);
+        var data = first.encode();
+        save('test/out/no/perl.ods', data);
+
+        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        expect(decoder.tables.length, expectedPerl.keys.length);
+        decoder.tables.forEach((name, table) {
+          expect(table.rows, expectedPerl[name]);
+        });
+      });
+
+      test('Format file:', () {
+        var first = decode('format.ods', update: true);
+        var data = first.encode();
+        save('test/out/no/format.ods', data);
+
+        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        expect(decoder.tables.length, expectedFormat.keys.length);
+        decoder.tables.forEach((name, table) {
+          expect(table.rows, expectedFormat[name]);
+        });
+      });
+
+      test('Empty column file:', () {
+        var first = decode('empty_column.ods', update: true);
+        var data = first.encode();
+        save('test/out/no/empty_column.ods', data);
+
+        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        expect(decoder.tables.length, expectedEmptyColumn.keys.length);
+        decoder.tables.forEach((name, table) {
+          expect(table.rows, expectedEmptyColumn[name]);
+        });
+      });
+    });
+  });
+}

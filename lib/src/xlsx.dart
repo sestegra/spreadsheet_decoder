@@ -3,7 +3,8 @@ part of spreadsheet_decoder;
 const String _relationships = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
 const String _relationshipsStyles = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles";
 const String _relationshipsWorksheet = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet";
-const String _relationshipsSharedStrings = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings";
+const String _relationshipsSharedStrings =
+    "http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings";
 
 /// Convert a character based column
 int lettersToNumeric(String letters) {
@@ -65,10 +66,16 @@ class XlsxDecoder extends SpreadsheetDecoder {
   List<int> _numFormats = new List<int>();
   String _stylesTarget;
   String _sharedStringsTarget;
-  Map<String,String> _worksheetTargets = new Map<String,String>();
+  Map<String, String> _worksheetTargets = new Map<String, String>();
 
-  XlsxDecoder(Archive archive) {
+  XlsxDecoder(Archive archive, {bool update = false}) {
     this._archive = archive;
+    this._update = update;
+    if (_update == true) {
+      _archiveFiles = <String, ArchiveFile>{};
+      _sheets = <String, XmlNode>{};
+      _xmlFiles = <String, XmlDocument>{};
+    }
     _tables = new Map<String, SpreadsheetTable>();
     _parseRelations();
     _parseStyles();
@@ -147,13 +154,17 @@ class XlsxDecoder extends SpreadsheetDecoder {
     tables[name] = new SpreadsheetTable();
     var table = tables[name];
 
-    var sheet = _archive.findFile("xl/$target");
-    sheet.decompress();
+    var file = _archive.findFile("xl/$target");
+    file.decompress();
 
-    var document = parse(UTF8.decode(sheet.content));
-    document.findAllElements('row').forEach((child) {
+    var content = parse(UTF8.decode(file.content));
+    content.findAllElements('row').forEach((child) {
       _parseRow(child, table);
     });
+    if (_update == true) {
+      _sheets[name] = content;
+      _xmlFiles["xl/$target"] = content;
+    }
 
     _normalizeTable(table);
   }
@@ -217,19 +228,17 @@ class XlsxDecoder extends SpreadsheetDecoder {
           if (s != null) {
             var fmtId = _numFormats[int.parse(s)];
             // date
-            if (   ((fmtId >= 14) && (fmtId <= 17))
-                || (fmtId == 22)) {
+            if (((fmtId >= 14) && (fmtId <= 17)) || (fmtId == 22)) {
               var delta = num.parse(_parseValue(content)) * 24 * 3600 * 1000;
               var date = new DateTime(1899, 12, 30);
               value = date.add(new Duration(milliseconds: delta.toInt())).toIso8601String();
-            // time
-            } else if (   ((fmtId >= 18) && (fmtId <= 21))
-                       || ((fmtId >= 45) && (fmtId <= 47))) {
+              // time
+            } else if (((fmtId >= 18) && (fmtId <= 21)) || ((fmtId >= 45) && (fmtId <= 47))) {
               var delta = num.parse(_parseValue(content)) * 24 * 3600 * 1000;
               var date = new DateTime(0);
               date = date.add(new Duration(milliseconds: delta.toInt()));
               value = "${_twoDigits(date.hour)}:${_twoDigits(date.minute)}:${_twoDigits(date.second)}";
-            // number
+              // number
             } else {
               value = num.parse(_parseValue(content));
             }
@@ -253,5 +262,11 @@ class XlsxDecoder extends SpreadsheetDecoder {
     });
 
     return buffer.toString();
+  }
+
+  void updateCell(String sheet, int col, int row, dynamic value) {
+    if (_update != true) {
+      throw new ArgumentError("'update' should be set to 'true' on constructor");
+    }
   }
 }
