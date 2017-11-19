@@ -7,8 +7,6 @@ final Map<String, String> _spreasheetExtensionMap = <String, String>{
   _spreasheetXlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 };
 
-final _emptyRow = new List();
-
 // HTML entities to decode (see here http://books.evc-cit.info/apa.php)
 // Normalize new line
 String _unescape(String text) {
@@ -96,8 +94,10 @@ abstract class SpreadsheetDecoder {
   /// Dump XML content (for debug purpose)
   String dumpXmlContent([String sheet]);
 
-  /// Update the contents from [sheet] of the cell [column]x[row] with ndexes start from 0
-  void updateCell(String sheet, int col, int row, dynamic value);
+  /// Update the contents from [sheet] of the cell [columnIndex]x[rowIndex] with indexes start from 0
+  void updateCell(String sheet, int columnIndex, int rowIndex, dynamic value) {
+    _tables[sheet].rows[rowIndex][columnIndex] = value.toString();
+  }
 
   /// Encode bytes after update
   List<int> encode() {

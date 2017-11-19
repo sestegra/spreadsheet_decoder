@@ -130,6 +130,8 @@ class XlsxDecoder extends SpreadsheetDecoder {
 
     var foundRow = _findRowByIndex(_sheets[sheet], rowIndex);
     _updateCell(foundRow, columnIndex, rowIndex, value);
+
+    super.updateCell(sheet, columnIndex, rowIndex, value);
   }
 
   _parseRelations() {
@@ -232,14 +234,14 @@ class XlsxDecoder extends SpreadsheetDecoder {
     if (_isNotEmptyRow(row) && rowIndex > table._rows.length) {
       var repeat = rowIndex - table._rows.length;
       for (var index = 0; index < repeat; index++) {
-        table._rows.add(_emptyRow);
+        table._rows.add(new List());
       }
     }
 
     if (_isNotEmptyRow(row)) {
       table._rows.add(row);
     } else {
-      table._rows.add(_emptyRow);
+      table._rows.add(new List());
     }
 
     _countFilledRow(table, row);

@@ -39,9 +39,11 @@ class OdsDecoder extends SpreadsheetDecoder {
     var row = _findRowByIndex(_sheets[sheet], rowIndex);
     var cell = _findCellByIndex(row, columnIndex);
     _replaceCell(row, cell, value);
+
+    super.updateCell(sheet, columnIndex, rowIndex, value);
   }
 
-  _parseContent() {
+  void _parseContent() {
     var file = _archive.findFile(CONTENT_XML);
     file.decompress();
     var content = parse(UTF8.decode(file.content));
@@ -61,35 +63,61 @@ class OdsDecoder extends SpreadsheetDecoder {
     });
   }
 
-  _parseTable(XmlElement node, String name) {
+  void _parseTable(XmlElement node, String name) {
     tables[name] = new SpreadsheetTable();
     var table = tables[name];
+    var rows = _findRows(node);
 
-    _findRows(node).forEach((child) {
+    // Remove tailing empty rows
+    var filledRows = rows.toList().reversed.skipWhile((row) {
+      var empty = true;
+      for (var cell in _findCells(row)) {
+        if (_readCell(cell) != null) {
+          empty = false;
+          break;
+        }
+      }
+      return empty;
+    });
+
+    filledRows.toList().reversed.forEach((child) {
       _parseRow(child, table);
     });
 
     _normalizeTable(table);
   }
 
-  _parseRow(XmlElement node, SpreadsheetTable table) {
+  void _parseRow(XmlElement node, SpreadsheetTable table) {
     var row = new List();
+    var cells = _findCells(node);
 
-    _findCells(node).forEach((child) {
+    // Remove tailing empty cells
+    var filledCells = cells.toList().reversed.skipWhile((cell) => _readCell(cell) == null)  ;
+
+    filledCells.toList().reversed.forEach((child) {
       _parseCell(child, table, row);
     });
 
     var repeat = _getRowRepeated(node);
     for (var index = 0; index < repeat; index++) {
-      table._rows.add(row);
+      table._rows.add(new List.from(row));
     }
 
     _countFilledRow(table, row);
   }
 
-  _parseCell(XmlElement node, SpreadsheetTable table, List row) {
-    var value;
+  void _parseCell(XmlElement node, SpreadsheetTable table, List row) {
+    var value = _readCell(node);
+    var repeat = _getCellRepeated(node);
+    for (var index = 0; index < repeat; index++) {
+      row.add(value);
+    }
 
+    _countFilledColumn(table, row, value);
+  }
+
+  dynamic _readCell(XmlElement node) {
+    var value;
     var type = node.getAttribute('office:value-type');
     switch (type) {
       case 'float':
@@ -112,25 +140,19 @@ class OdsDecoder extends SpreadsheetDecoder {
       default:
         var list = new List<String>();
         node.findElements('text:p').forEach((child) {
-          list.add(_parseString(child));
+          list.add(_readString(child));
         });
         value = (list.isNotEmpty) ? list.join('\n') : null;
     }
-
-    var repeat = _getCellRepeated(node);
-    for (var index = 0; index < repeat; index++) {
-      row.add(value);
-    }
-
-    _countFilledColumn(table, row, value);
+    return value;
   }
 
-  _parseString(XmlElement node) {
+  String _readString(XmlElement node) {
     var buffer = new StringBuffer();
 
     node.children.forEach((child) {
       if (child is XmlElement) {
-        buffer.write(_unescape(_parseString(child)));
+        buffer.write(_unescape(_readString(child)));
       } else if (child is XmlText) {
         buffer.write(_unescape(child.text));
       }
