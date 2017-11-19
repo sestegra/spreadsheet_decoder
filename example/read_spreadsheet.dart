@@ -14,10 +14,10 @@ main(List<String> args) {
 
   var sheet = decoder.tables.keys.first;
   decoder
-    ..updateCell(sheet, 0, 0, "New A")
+    ..updateCell(sheet, 0, 0, 1337)
     ..updateCell(sheet, 1, 0, "New B")
     ..updateCell(sheet, 2, 0, "New C")
-    ..updateCell(sheet, 1, 1, "New D");
+    ..updateCell(sheet, 1, 1, 42.3);
 
   new File(join("test/out/${basename(file)}"))
     ..createSync(recursive: true)

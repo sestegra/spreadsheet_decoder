@@ -191,6 +191,41 @@ testXlsx() {
     });
   });
 
+  group('numericToLetters:', () {
+    test('Simple capital letter', () {
+      expect(numericToLetters(1), 'A');
+      expect(numericToLetters(2), 'B');
+      expect(numericToLetters(3), 'C');
+      expect(numericToLetters(4), 'D');
+      expect(numericToLetters(5), 'E');
+      expect(numericToLetters(6), 'F');
+      expect(numericToLetters(7), 'G');
+      expect(numericToLetters(8), 'H');
+      expect(numericToLetters(9), 'I');
+      expect(numericToLetters(10), 'J');
+      expect(numericToLetters(11), 'K');
+      expect(numericToLetters(12), 'L');
+      expect(numericToLetters(13), 'M');
+      expect(numericToLetters(14), 'N');
+      expect(numericToLetters(15), 'O');
+      expect(numericToLetters(16), 'P');
+      expect(numericToLetters(17), 'Q');
+      expect(numericToLetters(18), 'R');
+      expect(numericToLetters(19), 'S');
+      expect(numericToLetters(20), 'T');
+      expect(numericToLetters(21), 'U');
+      expect(numericToLetters(22), 'V');
+      expect(numericToLetters(23), 'W');
+      expect(numericToLetters(24), 'X');
+      expect(numericToLetters(25), 'Y');
+      expect(numericToLetters(26), 'Z');
+    });
+
+    test('Up to AMJ', () {
+      expect(numericToLetters(1024), 'AMJ');
+    });
+  });
+  
   group('cellCoordsFromCellId:', () {
     test('Simple coords', () {
       expect(cellCoordsFromCellId('A1'), [1, 1]);
@@ -355,6 +390,74 @@ testUpdateXlsx() {
         expect(decoder.tables.length, expectedEmptyColumn.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedEmptyColumn[name]);
+        });
+      });
+    });
+
+    group('Update', () {
+      test('Perl file #1', () {
+        var first = decode('perl.xlsx', update: true)
+          ..updateCell('Sheet1', 0, 0, "0x0")
+          ..updateCell('Sheet1', 1, 0, "1x0")
+          ..updateCell('Sheet1', 2, 0, "2x0")
+          ..updateCell('Sheet1', 0, 1, "0x1")
+          ..updateCell('Sheet1', 1, 1, "1x1")
+          ..updateCell('Sheet1', 2, 1, "2x1")
+          ..updateCell('Sheet1', 0, 2, "0x2")
+          ..updateCell('Sheet1', 1, 2, "1x2")
+          ..updateCell('Sheet1', 2, 2, "2x2")
+          ..updateCell('Sheet3', 1, 5, "Cell B6");
+        var data = first.encode();
+        save('test/out/update/perl.xlsx', data);
+
+        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        expect(decoder.tables.length, expectedPerlAfterUpdate.keys.length);
+        decoder.tables.forEach((name, table) {
+          expect(table.rows, expectedPerlAfterUpdate[name]);
+        });
+      });
+
+      test('Perl file #2', () {
+        var first = decode('perl.xlsx', update: true)
+          ..updateCell('Sheet1', 2, 0, "2x0")
+          ..updateCell('Sheet1', 1, 0, "1x0")
+          ..updateCell('Sheet1', 0, 0, "0x0")
+          ..updateCell('Sheet1', 2, 1, "2x1")
+          ..updateCell('Sheet1', 1, 1, "1x1")
+          ..updateCell('Sheet1', 0, 1, "0x1")
+          ..updateCell('Sheet1', 2, 2, "2x2")
+          ..updateCell('Sheet1', 1, 2, "1x2")
+          ..updateCell('Sheet1', 0, 2, "0x2")
+          ..updateCell('Sheet3', 1, 5, "Cell B6");
+        var data = first.encode();
+        save('test/out/update/perl.xlsx', data);
+
+        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        expect(decoder.tables.length, expectedPerlAfterUpdate.keys.length);
+        decoder.tables.forEach((name, table) {
+          expect(table.rows, expectedPerlAfterUpdate[name]);
+        });
+      });
+
+      test('Perl file #3', () {
+        var first = decode('perl.xlsx', update: true)
+          ..updateCell('Sheet1', 1, 0, "1x0")
+          ..updateCell('Sheet1', 2, 0, "2x0")
+          ..updateCell('Sheet1', 0, 0, "0x0")
+          ..updateCell('Sheet1', 1, 1, "1x1")
+          ..updateCell('Sheet1', 2, 1, "2x1")
+          ..updateCell('Sheet1', 0, 1, "0x1")
+          ..updateCell('Sheet1', 1, 2, "1x2")
+          ..updateCell('Sheet1', 2, 2, "2x2")
+          ..updateCell('Sheet1', 0, 2, "0x2")
+          ..updateCell('Sheet3', 1, 5, "Cell B6");
+        var data = first.encode();
+        save('test/out/update/perl.xlsx', data);
+
+        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        expect(decoder.tables.length, expectedPerlAfterUpdate.keys.length);
+        decoder.tables.forEach((name, table) {
+          expect(table.rows, expectedPerlAfterUpdate[name]);
         });
       });
     });

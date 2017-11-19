@@ -28,7 +28,7 @@ class OdsDecoder extends SpreadsheetDecoder {
     }
   }
 
-  void updateCell(String sheet, int column, int row, dynamic value) {
+  void updateCell(String sheet, int columnIndex, int rowIndex, dynamic value) {
     if (_update != true) {
       throw new ArgumentError("'update' should be set to 'true' on constructor");
     }
@@ -36,15 +36,9 @@ class OdsDecoder extends SpreadsheetDecoder {
       throw new ArgumentError("'$sheet' not found");
     }
 
-    var foundRow = _findRowByIndex(_sheets[sheet], row);
-    var foundCell = _findCellByIndex(foundRow, column);
-    var foundCellIndex = foundRow.children.indexOf(foundCell);
-
-    // TODO Manage value's type
-    var data = _escape(value.toString());
-    foundRow.children
-      ..removeAt(foundCellIndex)
-      ..insert(foundCellIndex, _stringCell(data));
+    var row = _findRowByIndex(_sheets[sheet], rowIndex);
+    var cell = _findCellByIndex(row, columnIndex);
+    _replaceCell(row, cell, value);
   }
 
   _parseContent() {
@@ -173,14 +167,14 @@ class OdsDecoder extends SpreadsheetDecoder {
     return int.parse(node.value);
   }
 
-  static XmlElement _findRowByIndex(XmlElement table, int index) {
+  static XmlElement _findRowByIndex(XmlElement table, int rowIndex) {
     XmlElement row;
     var rows = _findRows(table);
 
     var currentIndex = -1;
     for (var currentRow in rows) {
       currentIndex += _getRowRepeated(currentRow);
-      if (currentIndex >= index) {
+      if (currentIndex >= rowIndex) {
         row = currentRow;
         break;
       }
@@ -190,20 +184,20 @@ class OdsDecoder extends SpreadsheetDecoder {
     var repeat = _getRowRepeated(row);
     if (repeat != 1) {
       var rows = _expandRepeatedRows(table, row);
-      row = rows[index - (currentIndex - repeat + 1)];
+      row = rows[rowIndex - (currentIndex - repeat + 1)];
     }
 
     return row;
   }
 
-  static XmlElement _findCellByIndex(XmlElement row, int index) {
+  static XmlElement _findCellByIndex(XmlElement row, int columnIndex) {
     XmlElement cell;
     var cells = _findCells(row);
 
     var currentIndex = -1;
     for (var currentCell in cells) {
       currentIndex += _getCellRepeated(currentCell);
-      if (currentIndex >= index) {
+      if (currentIndex >= columnIndex) {
         cell = currentCell;
         break;
       }
@@ -213,7 +207,7 @@ class OdsDecoder extends SpreadsheetDecoder {
     var repeat = _getCellRepeated(cell);
     if (repeat != 1) {
       var cells = _expandRepeatedCells(row, cell);
-      cell = cells[index - (currentIndex - repeat + 1)];
+      cell = cells[columnIndex - (currentIndex - repeat + 1)];
     }
 
     return cell;
@@ -251,13 +245,23 @@ class OdsDecoder extends SpreadsheetDecoder {
     return cells;
   }
 
-  static XmlElement _stringCell(String value) {
+  static XmlElement _replaceCell(XmlElement row, XmlElement lastCell, dynamic value) {
+    var index = row.children.indexOf(lastCell);
+    var cell = _createCell(value);
+    row.children
+      ..removeAt(index)
+      ..insert(index, cell);
+    return cell;
+  }
+
+  // TODO Manage value's type
+  static XmlElement _createCell(String value) {
     var attributes = <XmlAttribute>[
       new XmlAttribute(new XmlName('office:value-type'), "string"),
       new XmlAttribute(new XmlName('calcext:value-type'), "string"),
     ];
     var children = <XmlNode>[
-      new XmlElement(new XmlName('text:p'), [], [new XmlText(value)]),
+      new XmlElement(new XmlName('text:p'), [], [new XmlText(_escape(value.toString()))]),
     ];
     return new XmlElement(new XmlName('table:table-cell'), attributes, children);
   }
