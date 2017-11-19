@@ -113,6 +113,8 @@ abstract class SpreadsheetDecoder {
     return new ZipEncoder().encode(_cloneArchive(_archive));
   }
 
+  XmlDocument _parseXml(String xml) => _update == false ? parse(xml) : mutableParse(xml);
+
   Archive _cloneArchive(Archive archive) {
     var clone = new Archive();
     archive.files.forEach((file) {
