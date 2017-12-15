@@ -238,10 +238,9 @@ class OdsDecoder extends SpreadsheetDecoder {
   static List<XmlElement> _expandRepeatedRows(XmlElement table, XmlElement row) {
     var repeat = _removeRowRepeated(row);
     var index = table.children.indexOf(row);
-    var xml = row.toString();
     var rows = <XmlElement>[];
     for (var i = 0; i < repeat; i++) {
-      rows.add(parse(xml).document.root.children.first);
+      rows.add(row.copy());
     }
 
     table.children
@@ -254,10 +253,9 @@ class OdsDecoder extends SpreadsheetDecoder {
   static List<XmlElement> _expandRepeatedCells(XmlElement row, XmlElement cell) {
     var repeat = _removeCellRepeated(cell);
     var index = row.children.indexOf(cell);
-    var xml = cell.toString();
     var cells = <XmlElement>[];
     for (var i = 0; i < repeat; i++) {
-      cells.add(parse(xml).document.root.children.first);
+      cells.add(cell.copy());
     }
 
     row.children
