@@ -7,8 +7,8 @@ homepage: https://github.com/sestegra/spreadsheet
 environment:
   sdk: '>=1.13.0 <2.0.0'
 dependencies:
-  archive: '^1.0.32'
-  xml: '^2.4.4'
+  archive: '^1.0.33'
+  xml: '^2.6.0'
 dev_dependencies:
   test: '^0.12.0'
 dependency_overrides:
