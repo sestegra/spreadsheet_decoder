@@ -46,7 +46,7 @@ class OdsDecoder extends SpreadsheetDecoder {
   void _parseContent() {
     var file = _archive.findFile(CONTENT_XML);
     file.decompress();
-    var content = _parseXml(UTF8.decode(file.content));
+    var content = parse(UTF8.decode(file.content));
     if (_update == true) {
       _archiveFiles = <String, ArchiveFile>{};
       _sheets = <String, XmlNode>{};
@@ -189,7 +189,7 @@ class OdsDecoder extends SpreadsheetDecoder {
     return int.parse(node.value);
   }
 
-  XmlElement _findRowByIndex(XmlElement table, int rowIndex) {
+  static XmlElement _findRowByIndex(XmlElement table, int rowIndex) {
     XmlElement row;
     var rows = _findRows(table);
 
@@ -235,13 +235,13 @@ class OdsDecoder extends SpreadsheetDecoder {
     return cell;
   }
 
-  List<XmlElement> _expandRepeatedRows(XmlElement table, XmlElement row) {
+  static List<XmlElement> _expandRepeatedRows(XmlElement table, XmlElement row) {
     var repeat = _removeRowRepeated(row);
     var index = table.children.indexOf(row);
     var xml = row.toString();
     var rows = <XmlElement>[];
     for (var i = 0; i < repeat; i++) {
-      rows.add(_parseXml(xml).document.root.children.first);
+      rows.add(parse(xml).document.root.children.first);
     }
 
     table.children

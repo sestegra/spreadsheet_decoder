@@ -208,7 +208,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
     var file = _archive.findFile("xl/$target");
     file.decompress();
 
-    var content = _parseXml(UTF8.decode(file.content));
+    var content = parse(UTF8.decode(file.content));
     var workbench = content.lastChild as XmlElement;
     var sheet = workbench.findElements('sheetData').first;
 
@@ -389,7 +389,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
     var attributes = <XmlAttribute>[
       new XmlAttribute(new XmlName('r'), (rowIndex + 1).toString()),
     ];
-    return new XmlElement.mutable(new XmlName('row'), attributes, []);
+    return new XmlElement(new XmlName('row'), attributes, []);
   }
 
   static XmlElement _insertRow(XmlElement table, XmlElement lastRow, int rowIndex) {
