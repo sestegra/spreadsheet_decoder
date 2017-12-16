@@ -1,3 +1,6 @@
+## 0.4.0
+Add updateCell method to update existing cells content
+
 ## 0.3.2
 Fix string parsing on xlsx file
 Fix sheet target selection

@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/sestegra/spreadsheet_decoder/badge.svg?branch=master)](https://coveralls.io/r/sestegra/spreadsheet_decoder?branch=master)
 [![Pub version](https://img.shields.io/pub/v/spreadsheet_decoder.svg)](https://pub.dartlang.org/packages/spreadsheet_decoder)
 
-Spreadsheet Decoder is a library for decoding spreadsheets for ODS and XLSX files.
+Spreadsheet Decoder is a library for decoding and updating spreadsheets for ODS and XLSX files.
 
 ## Usage
 
@@ -19,6 +19,9 @@ Spreadsheet Decoder is a library for decoding spreadsheets for ODS and XLSX file
       var table = decoder.tables['Sheet1'];
       var values = table.rows[0];
       ...
+      decoder.updateCell('Sheet1', 0, 0, 1337);
+      new File(join(fullUri).writeAsBytesSync(decoder.encode());
+      ...
     }
 
 ### On client-side
@@ -32,6 +35,9 @@ Spreadsheet Decoder is a library for decoding spreadsheets for ODS and XLSX file
         var decoder = new SpreadsheetDecoder.decodeBytes(reader.result);
         var table = decoder.tables['Sheet1'];
         var values = table.rows[0];
+        ...
+        decoder.updateCell('Sheet1', 0, 0, 1337);
+        var bytes = decoder.encode();
         ...
       });
     }
