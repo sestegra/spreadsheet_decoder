@@ -96,7 +96,7 @@ abstract class SpreadsheetDecoder {
 
   /// Update the contents from [sheet] of the cell [columnIndex]x[rowIndex] with indexes start from 0
   void updateCell(String sheet, int columnIndex, int rowIndex, dynamic value) {
-    _tables[sheet].rows[rowIndex][columnIndex] = value.toString();
+    _tables[sheet].updateCell(columnIndex, rowIndex, value);
   }
 
   /// Encode bytes after update
@@ -186,4 +186,9 @@ class SpreadsheetTable {
 
   /// List of table's rows
   List<List> get rows => _rows;
+
+  /// Update the contents of the cell [columnIndex]x[rowIndex] with indexes start from 0
+  void updateCell(int columnIndex, int rowIndex, dynamic value) {
+    _rows[rowIndex][columnIndex] = value.toString();
+  }
 }
