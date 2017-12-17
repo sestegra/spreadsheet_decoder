@@ -202,7 +202,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
   _parseTable(XmlElement node) {
     var name = node.getAttribute('name');
     var target = _worksheetTargets[node.getAttribute('id', namespace: _relationships)];
-    tables[name] = new SpreadsheetTable();
+    tables[name] = new SpreadsheetTable(name);
     var table = tables[name];
 
     var file = _archive.findFile("xl/$target");

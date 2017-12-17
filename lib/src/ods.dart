@@ -64,7 +64,7 @@ class OdsDecoder extends SpreadsheetDecoder {
   }
 
   void _parseTable(XmlElement node, String name) {
-    tables[name] = new SpreadsheetTable();
+    tables[name] = new SpreadsheetTable(name);
     var table = tables[name];
     var rows = _findRows(node);
 
@@ -275,7 +275,7 @@ class OdsDecoder extends SpreadsheetDecoder {
   }
 
   // TODO Manage value's type
-  static XmlElement _createCell(String value) {
+  static XmlElement _createCell(dynamic value) {
     var attributes = <XmlAttribute>[
       new XmlAttribute(new XmlName('office:value-type'), "string"),
       new XmlAttribute(new XmlName('calcext:value-type'), "string"),
