@@ -52,3 +52,7 @@ This implementation doesn't support following features:
 
 For XLSX format, this implementation only supports native Excel format for date, time and boolean type conversion.
 In other words, custom format for date, time, boolean aren't supported and then file exported from LibreOffice as well.
+
+## License
+
+The MIT License, see [LICENSE](https://github.com/sestegra/spreadsheet_decoder/raw/master/LICENSE).
