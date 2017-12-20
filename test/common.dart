@@ -394,8 +394,9 @@ testUpdateXlsx() {
       });
 
       test('dataUrl', () {
-        var ods = decode('test.xlsx', update: true);
-        var data = ods.dataUrl();
+        var xlsx = decode('test.xlsx', update: true);
+        expect(xlsx.extension, '.xlsx');
+        var data = xlsx.dataUrl();
 
         var decoder = new SpreadsheetDecoder.decodeBytes(BASE64.decode(data.split(',').last));
         expect(decoder.tables.length, expectedTest.keys.length);
@@ -538,6 +539,7 @@ testUpdateOds() {
 
       test('dataUrl', () {
         var ods = decode('test.ods', update: true);
+        expect(ods.extension, '.ods');
         var data = ods.dataUrl();
 
         var decoder = new SpreadsheetDecoder.decodeBytes(BASE64.decode(data.split(',').last));
