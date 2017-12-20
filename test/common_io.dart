@@ -1,9 +1,18 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:spreadsheet_decoder/spreadsheet_decoder.dart';
 
-SpreadsheetDecoder decode(String filename, {bool update = false}) {
+List<int> _readBytes(String filename) {
   var fullUri = new Uri.file('test/files/$filename');
-  return new SpreadsheetDecoder.decodeBytes(new File.fromUri(fullUri).readAsBytesSync(), update: update, verify: true);
+  return new File.fromUri(fullUri).readAsBytesSync();
+}
+
+String readBase64(String filename) {
+  return BASE64.encode(_readBytes(filename));
+}
+
+SpreadsheetDecoder decode(String filename, {bool update = false}) {
+  return new SpreadsheetDecoder.decodeBytes(_readBytes(filename), update: update, verify: true);
 }
 
 void save(String file, List<int> data) {

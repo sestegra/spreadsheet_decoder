@@ -13,6 +13,8 @@ const String CONTENT_XML = 'content.xml';
 
 /// Read and parse ODS spreadsheet
 class OdsDecoder extends SpreadsheetDecoder {
+  String get mediaType => "application/vnd.oasis.opendocument.spreadsheet";
+
   OdsDecoder(Archive archive, {bool update = false}) {
     this._archive = archive;
     this._update = update;

@@ -76,6 +76,9 @@ abstract class SpreadsheetDecoder {
 
   Map<String, SpreadsheetTable> _tables;
 
+  /// Media type
+  String get mediaType;
+
   /// Tables contained in spreadsheet file indexed by their names
   Map<String, SpreadsheetTable> get tables => _tables;
 
@@ -111,6 +114,14 @@ abstract class SpreadsheetDecoder {
       _archiveFiles[xmlFile] = new ArchiveFile(xmlFile, content.length, content);
     }
     return new ZipEncoder().encode(_cloneArchive(_archive));
+  }
+
+  /// Encode data url
+  String dataUrl() {
+    var buffer = new StringBuffer();
+    buffer.write("data:${mediaType};base64,");
+    buffer.write(BASE64.encode(encode()));
+    return buffer.toString();
   }
 
   Archive _cloneArchive(Archive archive) {

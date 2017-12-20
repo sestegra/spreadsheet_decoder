@@ -86,6 +86,8 @@ List cellCoordsFromCellId(String cellId) {
 
 /// Read and parse XSLX spreadsheet
 class XlsxDecoder extends SpreadsheetDecoder {
+  String get mediaType => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
   List<String> _sharedStrings = new List<String>();
   List<int> _numFormats = new List<int>();
   String _stylesTarget;

@@ -1,3 +1,6 @@
+## 0.4.1-alpha
+Add
+
 ## 0.4.0-alpha
 Add updateCell method to update existing cells content
 
