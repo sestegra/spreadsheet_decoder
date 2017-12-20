@@ -26,3 +26,5 @@ doc/api/
 
 # LibreOffice locks
 .~lock.*#
+
+test/out/

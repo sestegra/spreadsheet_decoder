@@ -1,13 +1,11 @@
 part of spreadsheet_decoder;
 
-const _spreasheetOds  = 'ods';
+const _spreasheetOds = 'ods';
 const _spreasheetXlsx = 'xlsx';
 final Map<String, String> _spreasheetExtensionMap = <String, String>{
-  _spreasheetOds:  'application/vnd.oasis.opendocument.spreadsheet',
+  _spreasheetOds: 'application/vnd.oasis.opendocument.spreadsheet',
   _spreasheetXlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 };
-
-final _emptyRow = new List();
 
 // HTML entities to decode (see here http://books.evc-cit.info/apa.php)
 // Normalize new line
@@ -19,10 +17,18 @@ String _unescape(String text) {
       .replaceAll("&lt;", "<")
       .replaceAll("&gt;", ">")
       .replaceAll("\r\n", "\n");
-
 }
 
-SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive) {
+String _escape(String text) {
+  return text
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&apos;")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;");
+}
+
+SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive, bool update) {
   // Lookup at file format
   var format;
 
@@ -35,7 +41,7 @@ SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive) {
       format = _spreasheetOds;
     }
 
-  // Try OpenXml Office format
+    // Try OpenXml Office format
   } else {
     var xl = archive.findFile('xl/workbook.xml');
     format = xl != null ? _spreasheetXlsx : null;
@@ -43,33 +49,87 @@ SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive) {
 
   switch (format) {
     case _spreasheetOds:
-      return new OdsDecoder(archive);
+      return new OdsDecoder(archive, update: update);
     case _spreasheetXlsx:
-      return new XlsxDecoder(archive);
+      return new XlsxDecoder(archive, update: update);
     default:
       throw new UnsupportedError("Spreadsheet format unsupported");
   }
 }
 
+// Issue on archive
+// https://github.com/brendan-duncan/archive/pull/43
+const List<String> _noCompression = const <String>[
+  'mimetype',
+  'Thumbnails/thumbnail.png',
+];
+
 /**
  * Decode a spreadsheet file.
  */
 abstract class SpreadsheetDecoder {
+  bool _update;
   Archive _archive;
+  Map<String, XmlNode> _sheets;
+  Map<String, XmlDocument> _xmlFiles;
+  Map<String, ArchiveFile> _archiveFiles;
+
   Map<String, SpreadsheetTable> _tables;
+
   /// Tables contained in spreadsheet file indexed by their names
   Map<String, SpreadsheetTable> get tables => _tables;
 
   SpreadsheetDecoder();
 
-  factory SpreadsheetDecoder.decodeBytes(List<int> data, {bool verify: false}) {
+  factory SpreadsheetDecoder.decodeBytes(List<int> data, {bool update: false, bool verify: false}) {
     var archive = new ZipDecoder().decodeBytes(data, verify: verify);
-    return _newSpreadsheetDecoder(archive);
+    return _newSpreadsheetDecoder(archive, update);
   }
 
-  factory SpreadsheetDecoder.decodeBuffer(InputStream input, {bool verify: false}) {
+  factory SpreadsheetDecoder.decodeBuffer(InputStream input, {bool update: false, bool verify: false}) {
     var archive = new ZipDecoder().decodeBuffer(input, verify: verify);
-    return _newSpreadsheetDecoder(archive);
+    return _newSpreadsheetDecoder(archive, update);
+  }
+
+  /// Dump XML content (for debug purpose)
+  String dumpXmlContent([String sheet]);
+
+  /// Update the contents from [sheet] of the cell [columnIndex]x[rowIndex] with indexes start from 0
+  void updateCell(String sheet, int columnIndex, int rowIndex, dynamic value) {
+    _tables[sheet].rows[rowIndex][columnIndex] = value.toString();
+  }
+
+  /// Encode bytes after update
+  List<int> encode() {
+    if (_update != true) {
+      throw new ArgumentError("'update' should be set to 'true' on constructor");
+    }
+
+    for (var xmlFile in _xmlFiles.keys) {
+      var xml = _xmlFiles[xmlFile].toString();
+      var content = UTF8.encode(xml);
+      _archiveFiles[xmlFile] = new ArchiveFile(xmlFile, content.length, content);
+    }
+    return new ZipEncoder().encode(_cloneArchive(_archive));
+  }
+
+  Archive _cloneArchive(Archive archive) {
+    var clone = new Archive();
+    archive.files.forEach((file) {
+      if (file.isFile) {
+        ArchiveFile copy;
+        if (_archiveFiles.containsKey(file.name)) {
+          copy = _archiveFiles[file.name];
+        } else {
+          var content = (file.content as Uint8List).toList();
+          //var compress = file.compress;
+          var compress = _noCompression.contains(file.name) ? false : true;
+          copy = new ArchiveFile(file.name, content.length, content)..compress = compress;
+        }
+        clone.addFile(copy);
+      }
+    });
+    return clone;
   }
 
   _normalizeTable(SpreadsheetTable table) {
@@ -119,10 +179,14 @@ abstract class SpreadsheetDecoder {
 
 /// Table of a spreadsheet file
 class SpreadsheetTable {
+  final String name;
+  SpreadsheetTable(this.name);
+
   int _maxRows = -1;
   int _maxCols = -1;
 
   List<List> _rows = new List<List>();
+
   /// List of table's rows
   List<List> get rows => _rows;
 }
