@@ -79,6 +79,9 @@ abstract class SpreadsheetDecoder {
   /// Media type
   String get mediaType;
 
+  /// Filename extension
+  String get extension;
+
   /// Tables contained in spreadsheet file indexed by their names
   Map<String, SpreadsheetTable> get tables => _tables;
 
