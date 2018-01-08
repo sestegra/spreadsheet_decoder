@@ -268,4 +268,10 @@ class SpreadsheetTable {
 
   /// List of table's rows
   List<List> get rows => _rows;
+
+  /// Get max rows
+  int get maxRows => _maxRows;
+
+  /// Get max cols
+  int get maxCols => _maxCols;
 }

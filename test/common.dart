@@ -109,6 +109,14 @@ var expectedEmptyColumn = {
   ]
 };
 
+Map<String, List<List>> copyTables(Map<String, List<List>> tables) {
+  var copy = new Map();
+  tables.forEach((sheet, table) {
+    copy[sheet] = new List.from(table.map((row) => new List.from(row)));
+  });
+  return copy;
+}
+
 testUnsupported() {
   test('Unsupported file', () {
     var decoder;
@@ -225,7 +233,7 @@ testXlsx() {
       expect(numericToLetters(1024), 'AMJ');
     });
   });
-  
+
   group('cellCoordsFromCellId:', () {
     test('Simple coords', () {
       expect(cellCoordsFromCellId('A1'), [1, 1]);
@@ -473,6 +481,264 @@ testUpdateXlsx() {
         });
       });
     });
+
+    group('row', () {
+      group('insert', () {
+        test('at top', () {
+          var first = decode('test.ods', update: true)..insertRow('ONE', 0);
+          var data = first.encode();
+          save('test/out/update/test.ods', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].insert(0, [null, null, null]);
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('at bottom', () {
+          var first = decode('test.ods', update: true)
+            ..insertRow('ONE', 12)
+            ..updateCell('ONE', 0, 12, 'insert');
+          var data = first.encode();
+          save('test/out/update/test.ods', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].add(['insert', null, null]);
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('in between', () {
+          var first = decode('test.ods', update: true)..insertRow('ONE', 10);
+          var data = first.encode();
+          save('test/out/update/test.ods', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].insert(10, [null, null, null]);
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('ArgumentError exception', () {
+          expect(() => decode('test.ods')..insertRow('ONE', 1), throwsArgumentError);
+        });
+
+        test('ArgumentError exception', () {
+          expect(() => decode('test.ods', update: true)..insertRow('UNKNOWN', 1), throwsArgumentError);
+        });
+
+        test('RangeError exception', () {
+          expect(() => decode('test.ods', update: true)..insertRow('ONE', 13), throwsRangeError);
+        });
+      });
+
+      group('remove', () {
+        test('at top', () {
+          var first = decode('test.xlsx', update: true)..removeRow('ONE', 0);
+          var data = first.encode();
+          save('test/out/update/test.xlsx', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].removeAt(0);
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('at bottom', () {
+          var first = decode('test.xlsx', update: true)..removeRow('ONE', 11);
+          var data = first.encode();
+          save('test/out/update/test.xlsx', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].removeAt(11);
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('in between', () {
+          var first = decode('test.xlsx', update: true)..removeRow('ONE', 10);
+          var data = first.encode();
+          save('test/out/update/test.xlsx', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].removeAt(10);
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('ArgumentError exception', () {
+          expect(() => decode('test.xlsx')..removeRow('ONE', 1), throwsArgumentError);
+        });
+
+        test('ArgumentError exception', () {
+          expect(() => decode('test.xlsx', update: true)..removeRow('UNKNOWN', 1), throwsArgumentError);
+        });
+
+        test('RangeError exception', () {
+          expect(() => decode('test.xlsx', update: true)..removeRow('ONE', 13), throwsRangeError);
+        });
+      });
+    });
+
+    group('col', () {
+      group('insert', () {
+        test('at left', () {
+          var first = decode('test.xlsx', update: true)..insertColumn('ONE', 0);
+          var data = first.encode();
+          save('test/out/update/test.xlsx', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].forEach((row) {
+            row.insert(0, null);
+          });
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('at right', () {
+          var first = decode('test.xlsx', update: true)
+            ..insertColumn('ONE', 3)
+            ..updateCell('ONE', 3, 0, 'insert');
+          var data = first.encode();
+          save('test/out/update/test.xlsx', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].forEach((row) {
+            row.add(null);
+          });
+          expectedTables['ONE'][0][3] = 'insert';
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('in between', () {
+          var first = decode('test.xlsx', update: true)..insertColumn('ONE', 1);
+          var data = first.encode();
+          save('test/out/update/test.xlsx', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].forEach((row) {
+            row.insert(1, null);
+          });
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('ArgumentError exception', () {
+          expect(() => decode('test.xlsx')..insertColumn('ONE', 1), throwsArgumentError);
+        });
+
+        test('ArgumentError exception', () {
+          expect(() => decode('test.xlsx', update: true)..insertColumn('UNKNOWN', 1), throwsArgumentError);
+        });
+
+        test('RangeError exception', () {
+          expect(() => decode('test.xlsx', update: true)..insertColumn('ONE', 13), throwsRangeError);
+        });
+      });
+
+      group('remove', () {
+        test('at left', () {
+          var first = decode('test.xlsx', update: true)..removeColumn('ONE', 0);
+          var data = first.encode();
+          save('test/out/update/test.xlsx', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].forEach((row) {
+            row.removeAt(0);
+          });
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('at right', () {
+          var first = decode('test.xlsx', update: true)
+            ..removeColumn('ONE', 2);
+          var data = first.encode();
+          save('test/out/update/test.xlsx', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].forEach((row) {
+            row.removeAt(2);
+          });
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('in between', () {
+          var first = decode('test.xlsx', update: true)..removeColumn('ONE', 1);
+          var data = first.encode();
+          save('test/out/update/test.xlsx', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].forEach((row) {
+            row.removeAt(1);
+          });
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('ArgumentError exception', () {
+          expect(() => decode('test.xlsx')..removeColumn('ONE', 1), throwsArgumentError);
+        });
+
+        test('ArgumentError exception', () {
+          expect(() => decode('test.xlsx', update: true)..removeColumn('UNKNOWN', 1), throwsArgumentError);
+        });
+
+        test('RangeError exception', () {
+          expect(() => decode('test.xlsx', update: true)..removeColumn('ONE', 13), throwsRangeError);
+        });
+      });
+    });
   });
 }
 
@@ -614,6 +880,264 @@ testUpdateOds() {
         expect(decoder.tables.length, expectedPerlAfterUpdate.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedPerlAfterUpdate[name]);
+        });
+      });
+    });
+
+    group('row', () {
+      group('insert', () {
+        test('at top', () {
+          var first = decode('test.ods', update: true)..insertRow('ONE', 0);
+          var data = first.encode();
+          save('test/out/update/test.ods', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].insert(0, [null, null, null]);
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('at bottom', () {
+          var first = decode('test.ods', update: true)
+            ..insertRow('ONE', 12)
+            ..updateCell('ONE', 0, 12, 'insert');
+          var data = first.encode();
+          save('test/out/update/test.ods', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].add(['insert', null, null]);
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('in between', () {
+          var first = decode('test.ods', update: true)..insertRow('ONE', 10);
+          var data = first.encode();
+          save('test/out/update/test.ods', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].insert(10, [null, null, null]);
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('ArgumentError exception', () {
+          expect(() => decode('test.ods')..insertRow('ONE', 1), throwsArgumentError);
+        });
+
+        test('ArgumentError exception', () {
+          expect(() => decode('test.ods', update: true)..insertRow('UNKNOWN', 1), throwsArgumentError);
+        });
+
+        test('RangeError exception', () {
+          expect(() => decode('test.ods', update: true)..insertRow('ONE', 13), throwsRangeError);
+        });
+      });
+
+      group('remove', () {
+        test('at top', () {
+          var first = decode('test.ods', update: true)..removeRow('ONE', 0);
+          var data = first.encode();
+          save('test/out/update/test.ods', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].removeAt(0);
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('at bottom', () {
+          var first = decode('test.ods', update: true)..removeRow('ONE', 11);
+          var data = first.encode();
+          save('test/out/update/test.ods', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].removeAt(11);
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('in between', () {
+          var first = decode('test.ods', update: true)..removeRow('ONE', 10);
+          var data = first.encode();
+          save('test/out/update/test.ods', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].removeAt(10);
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('ArgumentError exception', () {
+          expect(() => decode('test.ods')..removeRow('ONE', 1), throwsArgumentError);
+        });
+
+        test('ArgumentError exception', () {
+          expect(() => decode('test.ods', update: true)..removeRow('UNKNOWN', 1), throwsArgumentError);
+        });
+
+        test('RangeError exception', () {
+          expect(() => decode('test.ods', update: true)..removeRow('ONE', 13), throwsRangeError);
+        });
+      });
+    });
+
+    group('col', () {
+      group('insert', () {
+        test('at left', () {
+          var first = decode('test.ods', update: true)..insertColumn('ONE', 0);
+          var data = first.encode();
+          save('test/out/update/test.ods', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].forEach((row) {
+            row.insert(0, null);
+          });
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('at right', () {
+          var first = decode('test.ods', update: true)
+            ..insertColumn('ONE', 3)
+            ..updateCell('ONE', 3, 0, 'insert');
+          var data = first.encode();
+          save('test/out/update/test.ods', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].forEach((row) {
+            row.add(null);
+          });
+          expectedTables['ONE'][0][3] = 'insert';
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('in between', () {
+          var first = decode('test.ods', update: true)..insertColumn('ONE', 1);
+          var data = first.encode();
+          save('test/out/update/test.ods', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].forEach((row) {
+            row.insert(1, null);
+          });
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('ArgumentError exception', () {
+          expect(() => decode('test.ods')..insertColumn('ONE', 1), throwsArgumentError);
+        });
+
+        test('ArgumentError exception', () {
+          expect(() => decode('test.ods', update: true)..insertColumn('UNKNOWN', 1), throwsArgumentError);
+        });
+
+        test('RangeError exception', () {
+          expect(() => decode('test.ods', update: true)..insertColumn('ONE', 13), throwsRangeError);
+        });
+      });
+
+      group('remove', () {
+        test('at left', () {
+          var first = decode('test.ods', update: true)..removeColumn('ONE', 0);
+          var data = first.encode();
+          save('test/out/update/test.ods', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].forEach((row) {
+            row.removeAt(0);
+          });
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('at right', () {
+          var first = decode('test.ods', update: true)
+            ..removeColumn('ONE', 2);
+          var data = first.encode();
+          save('test/out/update/test.ods', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].forEach((row) {
+            row.removeAt(2);
+          });
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('in between', () {
+          var first = decode('test.ods', update: true)..removeColumn('ONE', 1);
+          var data = first.encode();
+          save('test/out/update/test.ods', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['ONE'].forEach((row) {
+            row.removeAt(1);
+          });
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
+        });
+
+        test('ArgumentError exception', () {
+          expect(() => decode('test.ods')..removeColumn('ONE', 1), throwsArgumentError);
+        });
+
+        test('ArgumentError exception', () {
+          expect(() => decode('test.ods', update: true)..removeColumn('UNKNOWN', 1), throwsArgumentError);
+        });
+
+        test('RangeError exception', () {
+          expect(() => decode('test.ods', update: true)..removeColumn('ONE', 13), throwsRangeError);
         });
       });
     });
