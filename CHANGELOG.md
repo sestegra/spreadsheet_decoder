@@ -1,3 +1,6 @@
+## 0.4.3-alpha
+Add insert/remove columns/rows
+
 ## 0.4.2-alpha
 Add extension getter
 
