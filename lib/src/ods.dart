@@ -15,6 +15,7 @@ const String CONTENT_XML = 'content.xml';
 class OdsDecoder extends SpreadsheetDecoder {
   String get mediaType => "application/vnd.oasis.opendocument.spreadsheet";
   String get extension => ".ods";
+  Map<String, List<String>> _styleNames;
 
   OdsDecoder(Archive archive, {bool update = false}) {
     this._archive = archive;
@@ -29,6 +30,52 @@ class OdsDecoder extends SpreadsheetDecoder {
     } else {
       return _sheets[sheet].toXmlString(pretty: true);
     }
+  }
+
+  void insertColumn(String sheet, int columnIndex) {
+    super.insertColumn(sheet, columnIndex);
+
+    var rows = _findRows(_sheets[sheet]).toList();
+    for (var row in rows) {
+      var cell = _findCellByIndex(row, columnIndex);
+      if (cell != null) {
+        row.children.insert(row.children.indexOf(cell), _createCell(null));
+      } else {
+        row.children.add(_createCell(null));
+      }
+    }
+  }
+
+  void removeColumn(String sheet, int columnIndex) {
+    super.removeColumn(sheet, columnIndex);
+
+    var rows = _findRows(_sheets[sheet]).toList();
+    for (var row in rows) {
+      var cell = _findCellByIndex(row, columnIndex);
+      row.children.remove(cell);
+    }
+  }
+
+  void insertRow(String sheet, int rowIndex) {
+    super.insertRow(sheet, rowIndex);
+
+    var style = _styleNames['table-row'].first;
+    var parent = _sheets[sheet];
+    var newRow = _createRow(_tables[sheet]._maxCols, style);
+    var row = _findRowByIndex(parent, rowIndex);
+    if (row != null) {
+      parent.children.insert(parent.children.indexOf(row), newRow);
+    } else {
+      parent.children.add(newRow);
+    }
+  }
+
+  void removeRow(String sheet, int rowIndex) {
+    super.removeRow(sheet, rowIndex);
+
+    var parent = _sheets[sheet];
+    var row = _findRowByIndex(parent, rowIndex);
+    parent.children.remove(row);
   }
 
   void updateCell(String sheet, int columnIndex, int rowIndex, dynamic value) {
@@ -49,6 +96,7 @@ class OdsDecoder extends SpreadsheetDecoder {
       _xmlFiles = {
         CONTENT_XML: content,
       };
+      _parseStyles(content);
     }
     content.findAllElements('table:table').forEach((node) {
       var name = node.getAttribute('table:name');
@@ -59,6 +107,16 @@ class OdsDecoder extends SpreadsheetDecoder {
     });
   }
 
+  void _parseStyles(XmlDocument document) {
+    _styleNames = <String, List<String>>{};
+    document.findAllElements('style:style').forEach((style) {
+      var name = style.getAttribute('style:name');
+      var family = style.getAttribute('style:family');
+      _styleNames[family] ??= <String>[];
+      _styleNames[family].add(name);
+    });
+  }
+  
   void _parseTable(XmlElement node, String name) {
     tables[name] = new SpreadsheetTable(name);
     var table = tables[name];
@@ -73,6 +131,10 @@ class OdsDecoder extends SpreadsheetDecoder {
           break;
         }
       }
+      if (empty) {
+        row.parent.children.remove(row);
+      }
+
       return empty;
     });
 
@@ -88,7 +150,7 @@ class OdsDecoder extends SpreadsheetDecoder {
     var cells = _findCells(node);
 
     // Remove tailing empty cells
-    var filledCells = cells.toList().reversed.skipWhile((cell) => _readCell(cell) == null)  ;
+    var filledCells = cells.toList().reversed.skipWhile((cell) => _readCell(cell) == null);
 
     filledCells.toList().reversed.forEach((child) {
       _parseCell(child, table, row);
@@ -198,11 +260,13 @@ class OdsDecoder extends SpreadsheetDecoder {
       }
     }
 
-    // Expand row if required
-    var repeat = _getRowRepeated(row);
-    if (repeat != 1) {
-      var rows = _expandRepeatedRows(table, row);
-      row = rows[rowIndex - (currentIndex - repeat + 1)];
+    if (row != null) {
+      // Expand row if required
+      var repeat = _getRowRepeated(row);
+      if (repeat != 1) {
+        var rows = _expandRepeatedRows(table, row);
+        row = rows[rowIndex - (currentIndex - repeat + 1)];
+      }
     }
 
     return row;
@@ -221,11 +285,13 @@ class OdsDecoder extends SpreadsheetDecoder {
       }
     }
 
-    // Expand cell if required
-    var repeat = _getCellRepeated(cell);
-    if (repeat != 1) {
-      var cells = _expandRepeatedCells(row, cell);
-      cell = cells[columnIndex - (currentIndex - repeat + 1)];
+    if (cell != null) {
+      // Expand cell if required
+      var repeat = _getCellRepeated(cell);
+      if (repeat != 1) {
+        var cells = _expandRepeatedCells(row, cell);
+        cell = cells[columnIndex - (currentIndex - repeat + 1)];
+      }
     }
 
     return cell;
@@ -270,13 +336,25 @@ class OdsDecoder extends SpreadsheetDecoder {
     return cell;
   }
 
+  static XmlElement _createRow(int maxCols, String style) {
+    var attributes = <XmlAttribute>[
+      new XmlAttribute(new XmlName('table:style-name'), style),
+    ];
+    var children = <XmlNode>[
+      new XmlElement(new XmlName('table:table-cell'), [
+        new XmlAttribute(new XmlName('table:number-columns-repeated'), maxCols.toString()),
+      ]),
+    ];
+    return new XmlElement(new XmlName('table:table-row'), attributes, children);
+  }
+
   // TODO Manage value's type
   static XmlElement _createCell(dynamic value) {
-    var attributes = <XmlAttribute>[
+    var attributes = value == null ? <XmlAttribute>[] : <XmlAttribute>[
       new XmlAttribute(new XmlName('office:value-type'), "string"),
       new XmlAttribute(new XmlName('calcext:value-type'), "string"),
     ];
-    var children = <XmlNode>[
+    var children = value == null ? <XmlNode>[] : <XmlNode>[
       new XmlElement(new XmlName('text:p'), [], [new XmlText(_escape(value.toString()))]),
     ];
     return new XmlElement(new XmlName('table:table-cell'), attributes, children);

@@ -142,6 +142,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
       if (cell != null) {
         cells.skipWhile((c) => c != cell).forEach((c) => _setCellColNumber(c, _getCellNumber(c) + 1));
       }
+      // Nothing to do if cell == null
     }
   }
 
