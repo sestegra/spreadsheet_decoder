@@ -100,8 +100,73 @@ abstract class SpreadsheetDecoder {
   /// Dump XML content (for debug purpose)
   String dumpXmlContent([String sheet]);
 
+  void _checkSheetArguments(String sheet) {
+    if (_update != true) {
+      throw new ArgumentError("'update' should be set to 'true' on constructor");
+    }
+    if (_sheets.containsKey(sheet) == false) {
+      throw new ArgumentError("'$sheet' not found");
+    }
+  }
+
+  /// Insert column in [sheet] at position [columnIndex]
+  void insertColumn(String sheet, int columnIndex) {
+    _checkSheetArguments(sheet);
+    if (columnIndex < 0 || columnIndex > _tables[sheet]._maxCols) {
+      throw new RangeError.range(columnIndex, 0, _tables[sheet]._maxCols);
+    }
+
+    var table = _tables[sheet];
+    table.rows.forEach((row) => row.insert(columnIndex, null));
+    table._maxCols++;
+  }
+
+  /// Remove column in [sheet] at position [columnIndex]
+  void removeColumn(String sheet, int columnIndex) {
+    _checkSheetArguments(sheet);
+    if (columnIndex < 0 || columnIndex >= _tables[sheet]._maxCols) {
+      throw new RangeError.range(columnIndex, 0, _tables[sheet]._maxCols - 1);
+    }
+
+    var table = _tables[sheet];
+    table.rows.forEach((row) => row.removeAt(columnIndex));
+    table._maxCols--;
+  }
+
+  /// Insert row in [sheet] at position [rowIndex]
+  void insertRow(String sheet, int rowIndex) {
+    _checkSheetArguments(sheet);
+    if (rowIndex < 0 || rowIndex > _tables[sheet]._maxRows) {
+      throw new RangeError.range(rowIndex, 0, _tables[sheet]._maxRows);
+    }
+
+    var table = _tables[sheet];
+    table.rows.insert(rowIndex, new List.generate(table._maxCols, (_) => null));
+    table._maxRows++;
+  }
+
+  /// Remove row in [sheet] at position [rowIndex]
+  void removeRow(String sheet, int rowIndex) {
+    _checkSheetArguments(sheet);
+    if (rowIndex < 0 || rowIndex >= _tables[sheet]._maxRows) {
+      throw new RangeError.range(rowIndex, 0, _tables[sheet]._maxRows - 1);
+    }
+
+    var table = _tables[sheet];
+    table.rows.removeAt(rowIndex);
+    table._maxRows--;
+  }
+
   /// Update the contents from [sheet] of the cell [columnIndex]x[rowIndex] with indexes start from 0
   void updateCell(String sheet, int columnIndex, int rowIndex, dynamic value) {
+    _checkSheetArguments(sheet);
+    if (columnIndex < 0 || columnIndex >= _tables[sheet]._maxCols) {
+      throw new RangeError.range(columnIndex, 0, _tables[sheet]._maxCols - 1);
+    }
+    if (rowIndex < 0 || rowIndex >= _tables[sheet]._maxRows) {
+      throw new RangeError.range(rowIndex, 0, _tables[sheet]._maxRows - 1);
+    }
+
     _tables[sheet].rows[rowIndex][columnIndex] = value.toString();
   }
 

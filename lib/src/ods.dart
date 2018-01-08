@@ -32,18 +32,11 @@ class OdsDecoder extends SpreadsheetDecoder {
   }
 
   void updateCell(String sheet, int columnIndex, int rowIndex, dynamic value) {
-    if (_update != true) {
-      throw new ArgumentError("'update' should be set to 'true' on constructor");
-    }
-    if (_sheets.containsKey(sheet) == false) {
-      throw new ArgumentError("'$sheet' not found");
-    }
+    super.updateCell(sheet, columnIndex, rowIndex, value);
 
     var row = _findRowByIndex(_sheets[sheet], rowIndex);
     var cell = _findCellByIndex(row, columnIndex);
     _replaceCell(row, cell, value);
-
-    super.updateCell(sheet, columnIndex, rowIndex, value);
   }
 
   void _parseContent() {

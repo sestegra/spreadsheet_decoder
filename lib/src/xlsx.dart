@@ -123,18 +123,88 @@ class XlsxDecoder extends SpreadsheetDecoder {
     }
   }
 
+  void insertColumn(String sheet, int columnIndex) {
+    super.insertColumn(sheet, columnIndex);
+
+    for (var row in _findRows(_sheets[sheet])) {
+      XmlElement cell;
+      var cells = _findCells(row);
+
+      var currentIndex = 0; // cells could be empty
+      for (var currentCell in cells) {
+        currentIndex = _getCellNumber(currentCell) - 1;
+        if (currentIndex >= columnIndex) {
+          cell = currentCell;
+          break;
+        }
+      }
+
+      if (cell != null) {
+        cells.skipWhile((c) => c != cell).forEach((c) => _setCellColNumber(c, _getCellNumber(c) + 1));
+      }
+    }
+  }
+
+  void removeColumn(String sheet, int columnIndex) {
+    super.removeColumn(sheet, columnIndex);
+
+    for (var row in _findRows(_sheets[sheet])) {
+      XmlElement cell;
+      var cells = _findCells(row);
+
+      var currentIndex = 0; // cells could be empty
+      for (var currentCell in cells) {
+        currentIndex = _getCellNumber(currentCell) - 1;
+        if (currentIndex >= columnIndex) {
+          cell = currentCell;
+          break;
+        }
+      }
+
+      if (cell != null) {
+        cells.skipWhile((c) => c != cell).forEach((c) => _setCellColNumber(c, _getCellNumber(c) - 1));
+        cell.parent.children.remove(cell);
+      }
+    }
+  }
+
+  void insertRow(String sheet, int rowIndex) {
+    super.insertRow(sheet, rowIndex);
+
+    if (rowIndex < _tables[sheet]._maxRows - 1) {
+      var foundRow = _findRowByIndex(_sheets[sheet], rowIndex);
+      _insertRow(_sheets[sheet], foundRow, rowIndex);
+      foundRow.parent.children.skipWhile((row) => row != foundRow).forEach((row) {
+        var rIndex = _getRowNumber(row) + 1;
+        _setRowNumber(row, rIndex);
+        _findCells(row).forEach((cell) {
+          _setCellRowNumber(cell, rIndex);
+        });
+      });
+    } else {
+      _insertRow(_sheets[sheet], null, rowIndex);
+    }
+  }
+
+  void removeRow(String sheet, int rowIndex) {
+    super.removeRow(sheet, rowIndex);
+
+    var foundRow = _findRowByIndex(_sheets[sheet], rowIndex);
+    foundRow.parent.children.skipWhile((row) => row != foundRow).forEach((row) {
+      var rIndex = _getRowNumber(row) - 1;
+      _setRowNumber(row, rIndex);
+      _findCells(row).forEach((cell) {
+        _setCellRowNumber(cell, rIndex);
+      });
+    });
+    foundRow.parent.children.remove(foundRow);
+  }
+
   void updateCell(String sheet, int columnIndex, int rowIndex, dynamic value) {
-    if (_update != true) {
-      throw new ArgumentError("'update' should be set to 'true' on constructor");
-    }
-    if (_sheets.containsKey(sheet) == false) {
-      throw new ArgumentError("'$sheet' not found");
-    }
+    super.updateCell(sheet, columnIndex, rowIndex, value);
 
     var foundRow = _findRowByIndex(_sheets[sheet], rowIndex);
     _updateCell(foundRow, columnIndex, rowIndex, value);
-
-    super.updateCell(sheet, columnIndex, rowIndex, value);
   }
 
   _parseRelations() {
@@ -339,10 +409,21 @@ class XlsxDecoder extends SpreadsheetDecoder {
   static Iterable<XmlElement> _findCells(XmlElement row) => row.findElements('c');
 
   static int _getRowNumber(XmlElement row) => int.parse(row.getAttribute('r'));
+  static void _setRowNumber(XmlElement row, int index) => row.getAttributeNode('r').value = index.toString();
 
   static int _getCellNumber(XmlElement cell) {
     var coords = cellCoordsFromCellId(cell.getAttribute('r'));
     return coords[0];
+  }
+  static void _setCellColNumber(XmlElement cell, int colIndex) {
+    var attr = cell.getAttributeNode('r');
+    var coords = cellCoordsFromCellId(attr.value);
+    attr.value = '${numericToLetters(colIndex)}${coords[1]}';
+  }
+  static void _setCellRowNumber(XmlElement cell, int rowIndex) {
+    var attr = cell.getAttributeNode('r');
+    var coords = cellCoordsFromCellId(attr.value);
+    attr.value = '${numericToLetters(coords[0])}${rowIndex}';
   }
 
   static XmlElement _findRowByIndex(XmlElement table, int rowIndex) {
@@ -432,7 +513,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
       new XmlAttribute(new XmlName('r'), '${numericToLetters(columnIndex + 1)}${rowIndex + 1}'),
       new XmlAttribute(new XmlName('t'), 'inlineStr'),
     ];
-    var children = <XmlElement>[
+    var children = value == null ? <XmlElement>[] : <XmlElement>[
       new XmlElement(new XmlName('is'), [], [
         new XmlElement(new XmlName('t'), [], [new XmlText(_escape(value.toString()))])
       ]),
