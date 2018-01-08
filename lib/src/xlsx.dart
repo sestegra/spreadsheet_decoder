@@ -171,10 +171,11 @@ class XlsxDecoder extends SpreadsheetDecoder {
   void insertRow(String sheet, int rowIndex) {
     super.insertRow(sheet, rowIndex);
 
+    var parent = _sheets[sheet];
     if (rowIndex < _tables[sheet]._maxRows - 1) {
       var foundRow = _findRowByIndex(_sheets[sheet], rowIndex);
-      _insertRow(_sheets[sheet], foundRow, rowIndex);
-      foundRow.parent.children.skipWhile((row) => row != foundRow).forEach((row) {
+      _insertRow(parent, foundRow, rowIndex);
+      parent.children.skipWhile((row) => row != foundRow).forEach((row) {
         var rIndex = _getRowNumber(row) + 1;
         _setRowNumber(row, rIndex);
         _findCells(row).forEach((cell) {
@@ -182,22 +183,23 @@ class XlsxDecoder extends SpreadsheetDecoder {
         });
       });
     } else {
-      _insertRow(_sheets[sheet], null, rowIndex);
+      _insertRow(parent, null, rowIndex);
     }
   }
 
   void removeRow(String sheet, int rowIndex) {
     super.removeRow(sheet, rowIndex);
 
-    var foundRow = _findRowByIndex(_sheets[sheet], rowIndex);
-    foundRow.parent.children.skipWhile((row) => row != foundRow).forEach((row) {
+    var parent = _sheets[sheet];
+    var foundRow = _findRowByIndex(parent, rowIndex);
+    parent.children.skipWhile((row) => row != foundRow).forEach((row) {
       var rIndex = _getRowNumber(row) - 1;
       _setRowNumber(row, rIndex);
       _findCells(row).forEach((cell) {
         _setCellRowNumber(cell, rIndex);
       });
     });
-    foundRow.parent.children.remove(foundRow);
+    parent.children.remove(foundRow);
   }
 
   void updateCell(String sheet, int columnIndex, int rowIndex, dynamic value) {
