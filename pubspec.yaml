@@ -1,6 +1,6 @@
 name: spreadsheet_decoder
 description: Spreadsheet files decoder
-version: 0.4.3-alpha
+version: 0.4.3
 authors:
 - Stéphane Este-Gracias <sestegra@gmail.com>
 homepage: https://github.com/sestegra/spreadsheet
@@ -8,6 +8,6 @@ environment:
   sdk: '>=1.13.0 <2.0.0'
 dependencies:
   archive: '^1.0.33'
-  xml: '^3.0.0-alpha'
+  xml: '^3.0.0'
 dev_dependencies:
   test: '^0.12.0'

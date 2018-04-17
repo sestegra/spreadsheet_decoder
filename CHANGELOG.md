@@ -1,3 +1,6 @@
+## 0.4.3
+Upgrade to xml 3.0.0
+
 ## 0.4.3-alpha
 Add insert/remove columns/rows
 
