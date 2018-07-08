@@ -1,6 +1,6 @@
 part of spreadsheet_test;
 
-var expectedTest = {
+var expectedTest = <String, List<List>>{
   'ONE': [
     ['A', 'B', 'C'],
     [1, 2, 3],
@@ -32,7 +32,7 @@ var expectedTest = {
   'EMPTY': []
 };
 
-var expectedPerl = {
+var expectedPerl = <String, List<List>>{
   'Sheet1': [
     [-1500.99, 17, null],
     [null, null, null],
@@ -57,7 +57,7 @@ var expectedPerl = {
   ]
 };
 
-var expectedPerlAfterUpdate = {
+var expectedPerlAfterUpdate = <String, List<List>>{
   'Sheet1': [
     ["0x0", "1x0", "2x0"],
     ["0x1", "1x1", "2x1"],
@@ -82,7 +82,7 @@ var expectedPerlAfterUpdate = {
   ]
 };
 
-var expectedFormat = {
+var expectedFormat = <String, List<List>>{
   'Sheet1': [
     [
       1337,
@@ -101,7 +101,7 @@ var expectedFormat = {
   ]
 };
 
-var expectedEmptyColumn = {
+var expectedEmptyColumn = <String, List<List>>{
   'EMPTY': [
     ['a1', null, 'c1'],
     ['a2', null, 'c2'],
@@ -110,9 +110,9 @@ var expectedEmptyColumn = {
 };
 
 Map<String, List<List>> copyTables(Map<String, List<List>> tables) {
-  var copy = new Map();
+  var copy = <String, List<List>>{};
   tables.forEach((sheet, table) {
-    copy[sheet] = new List.from(table.map((row) => new List.from(row)));
+    copy[sheet] = new List<List>.from(table.map((row) => new List.from(row)));
   });
   return copy;
 }
@@ -692,8 +692,7 @@ testUpdateXlsx() {
         });
 
         test('at right', () {
-          var first = decode('test.xlsx', update: true)
-            ..removeColumn('ONE', 2);
+          var first = decode('test.xlsx', update: true)..removeColumn('ONE', 2);
           var data = first.encode();
           save('test/out/update/test.xlsx', data);
 
@@ -1094,8 +1093,7 @@ testUpdateOds() {
         });
 
         test('at right', () {
-          var first = decode('test.ods', update: true)
-            ..removeColumn('ONE', 2);
+          var first = decode('test.ods', update: true)..removeColumn('ONE', 2);
           var data = first.encode();
           save('test/out/update/test.ods', data);
 

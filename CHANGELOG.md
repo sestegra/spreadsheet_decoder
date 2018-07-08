@@ -1,3 +1,6 @@
+## 1.0.0
+Dart 2 support
+
 ## 0.4.3
 Upgrade to xml 3.0.0
 
