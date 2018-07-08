@@ -8,7 +8,7 @@ List<int> _readBytes(String filename) {
 }
 
 String readBase64(String filename) {
-  return BASE64.encode(_readBytes(filename));
+  return base64Encode(_readBytes(filename));
 }
 
 SpreadsheetDecoder decode(String filename, {bool update = false}) {

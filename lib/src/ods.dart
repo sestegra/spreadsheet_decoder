@@ -89,7 +89,7 @@ class OdsDecoder extends SpreadsheetDecoder {
   void _parseContent() {
     var file = _archive.findFile(CONTENT_XML);
     file.decompress();
-    var content = parse(UTF8.decode(file.content));
+    var content = parse(utf8.decode(file.content));
     if (_update == true) {
       _archiveFiles = <String, ArchiveFile>{};
       _sheets = <String, XmlNode>{};

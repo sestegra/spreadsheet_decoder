@@ -406,7 +406,7 @@ testUpdateXlsx() {
         expect(xlsx.extension, '.xlsx');
         var data = xlsx.dataUrl();
 
-        var decoder = new SpreadsheetDecoder.decodeBytes(BASE64.decode(data.split(',').last));
+        var decoder = new SpreadsheetDecoder.decodeBytes(base64Decode(data.split(',').last));
         expect(decoder.tables.length, expectedTest.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedTest[name]);
@@ -807,7 +807,7 @@ testUpdateOds() {
         expect(ods.extension, '.ods');
         var data = ods.dataUrl();
 
-        var decoder = new SpreadsheetDecoder.decodeBytes(BASE64.decode(data.split(',').last));
+        var decoder = new SpreadsheetDecoder.decodeBytes(base64Decode(data.split(',').last));
         expect(decoder.tables.length, expectedTest.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedTest[name]);

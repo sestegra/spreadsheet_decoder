@@ -36,7 +36,7 @@ SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive, bool update) {
   var mimetype = archive.findFile('mimetype');
   if (mimetype != null) {
     mimetype.decompress();
-    var content = UTF8.decode(mimetype.content);
+    var content = utf8.decode(mimetype.content);
     if (content == _spreasheetExtensionMap[_spreasheetOds]) {
       format = _spreasheetOds;
     }
@@ -178,7 +178,7 @@ abstract class SpreadsheetDecoder {
 
     for (var xmlFile in _xmlFiles.keys) {
       var xml = _xmlFiles[xmlFile].toString();
-      var content = UTF8.encode(xml);
+      var content = utf8.encode(xml);
       _archiveFiles[xmlFile] = new ArchiveFile(xmlFile, content.length, content);
     }
     return new ZipEncoder().encode(_cloneArchive(_archive));
@@ -188,7 +188,7 @@ abstract class SpreadsheetDecoder {
   String dataUrl() {
     var buffer = new StringBuffer();
     buffer.write("data:${mediaType};base64,");
-    buffer.write(BASE64.encode(encode()));
+    buffer.write(base64Encode(encode()));
     return buffer.toString();
   }
 

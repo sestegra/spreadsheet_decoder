@@ -77,7 +77,7 @@ String _twoDigits(int n) {
 /// "A1" returns [1, 1] and the "B3" return [2, 3].
 List cellCoordsFromCellId(String cellId) {
   var letters = cellId.runes.map(_letterOnly);
-  var lettersPart = UTF8.decode(letters.where((rune) => rune > 0).toList(growable: false));
+  var lettersPart = utf8.decode(letters.where((rune) => rune > 0).toList(growable: false));
   var numericsPart = cellId.substring(lettersPart.length);
   var x = lettersToNumeric(lettersPart);
   var y = int.parse(numericsPart);
@@ -214,7 +214,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
     var relations = _archive.findFile('xl/_rels/workbook.xml.rels');
     if (relations != null) {
       relations.decompress();
-      var document = parse(UTF8.decode(relations.content));
+      var document = parse(utf8.decode(relations.content));
       document.findAllElements('Relationship').forEach((node) {
         switch (node.getAttribute('Type')) {
           case _relationshipsStyles:
@@ -235,7 +235,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
     var styles = _archive.findFile('xl/$_stylesTarget');
     if (styles != null) {
       styles.decompress();
-      var document = parse(UTF8.decode(styles.content));
+      var document = parse(utf8.decode(styles.content));
       document.findAllElements('cellXfs').first.findElements('xf').forEach((node) {
         var numFmtId = node.getAttribute('numFmtId');
         if (numFmtId != null) {
@@ -251,7 +251,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
     var sharedStrings = _archive.findFile('xl/$_sharedStringsTarget');
     if (sharedStrings != null) {
       sharedStrings.decompress();
-      var document = parse(UTF8.decode(sharedStrings.content));
+      var document = parse(utf8.decode(sharedStrings.content));
       document.findAllElements('si').forEach((node) {
         _parseSharedString(node);
       });
@@ -269,7 +269,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
   _parseContent() {
     var workbook = _archive.findFile('xl/workbook.xml');
     workbook.decompress();
-    var document = parse(UTF8.decode(workbook.content));
+    var document = parse(utf8.decode(workbook.content));
     document.findAllElements('sheet').forEach((node) {
       _parseTable(node);
     });
@@ -284,7 +284,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
     var file = _archive.findFile("xl/$target");
     file.decompress();
 
-    var content = parse(UTF8.decode(file.content));
+    var content = parse(utf8.decode(file.content));
     var workbench = content.lastChild as XmlElement;
     var sheet = workbench.findElements('sheetData').first;
 
