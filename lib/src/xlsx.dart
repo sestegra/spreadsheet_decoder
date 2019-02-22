@@ -285,8 +285,8 @@ class XlsxDecoder extends SpreadsheetDecoder {
     file.decompress();
 
     var content = parse(utf8.decode(file.content));
-    var workbench = content.lastChild as XmlElement;
-    var sheet = workbench.findElements('sheetData').first;
+    var worksheet = content.findElements('worksheet').first;
+    var sheet = worksheet.findElements('sheetData').first;
 
     _findRows(sheet).forEach((child) {
       _parseRow(child, table);

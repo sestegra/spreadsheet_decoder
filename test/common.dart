@@ -109,6 +109,12 @@ var expectedEmptyColumn = <String, List<List>>{
   ]
 };
 
+var expectNumbers = <String, List<List>>{
+  'Blatt 1': [
+    ['Tabelle 1']
+    ]
+};
+
 Map<String, List<List>> copyTables(Map<String, List<List>> tables) {
   var copy = <String, List<List>>{};
   tables.forEach((sheet, table) {
@@ -286,6 +292,14 @@ testXlsx() {
       expect(decoder.tables.length, expectedEmptyColumn.keys.length);
       decoder.tables.forEach((name, table) {
         expect(table.rows, expectedEmptyColumn[name]);
+      });
+    });
+
+    test('Number to xlsx:', () {
+      var decoder = decode('numbers_to_xlsx.xlsx');
+      expect(decoder.tables.length, expectNumbers.keys.length);
+      decoder.tables.forEach((name, table) {
+        expect(table.rows, expectNumbers[name]);
       });
     });
   });
