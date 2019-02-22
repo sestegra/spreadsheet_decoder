@@ -1,3 +1,6 @@
+## 1.0.1
+Fix parsing on converted Numbers documents
+
 ## 1.0.0
 Dart 2 support
 

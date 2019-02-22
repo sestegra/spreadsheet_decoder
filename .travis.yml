@@ -1,6 +1,6 @@
 language: dart
 dart:
-#  - stable
+  - stable
   - dev
 after_success:
   - ./tool/coveralls.sh
