@@ -14,13 +14,13 @@ Spreadsheet Decoder is a library for decoding and updating spreadsheets for ODS 
     import 'package:spreadsheet_decoder/spreadsheet_decoder.dart';
 
     main() {
-      var bytes = new File.fromUri(fullUri).readAsBytesSync();
-      var decoder = new SpreadsheetDecoder.decodeBytes(bytes);
+      var bytes = File.fromUri(fullUri).readAsBytesSync();
+      var decoder = SpreadsheetDecoder.decodeBytes(bytes);
       var table = decoder.tables['Sheet1'];
       var values = table.rows[0];
       ...
       decoder.updateCell('Sheet1', 0, 0, 1337);
-      new File(join(fullUri).writeAsBytesSync(decoder.encode());
+      File(join(fullUri).writeAsBytesSync(decoder.encode());
       ...
     }
 
@@ -30,9 +30,9 @@ Spreadsheet Decoder is a library for decoding and updating spreadsheets for ODS 
     import 'package:spreadsheet_decoder/spreadsheet_decoder.dart';
 
     main() {
-      var reader = new FileReader();
+      var reader = FileReader();
       reader.onLoadEnd.listen((event) {
-        var decoder = new SpreadsheetDecoder.decodeBytes(reader.result);
+        var decoder = SpreadsheetDecoder.decodeBytes(reader.result);
         var table = decoder.tables['Sheet1'];
         var values = table.rows[0];
         ...

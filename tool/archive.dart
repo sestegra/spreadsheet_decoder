@@ -4,11 +4,11 @@ import 'package:archive/archive.dart';
 import 'package:path/path.dart';
 
 Archive cloneArchive(Archive archive) {
-  var clone = new Archive();
+  var clone = Archive();
   archive.files.forEach((file) {
     if (file.isFile) {
       var content = (file.content as Uint8List).toList();
-      var copy = new ArchiveFile(file.name, content.length, content)..compress = file.compress;
+      var copy = ArchiveFile(file.name, content.length, content)..compress = file.compress;
       clone.addFile(copy);
     }
   });
@@ -30,15 +30,15 @@ void binwalk(String path) {
 void main(List<String> args) {
   var path = args[0];
 
-  for (var file in new Directory(path).listSync(recursive: false)) {
+  for (var file in Directory(path).listSync(recursive: false)) {
     if (file is File) {
       var input = file.path;
       print(input);
-      var archive = new ZipDecoder().decodeBytes(new File(input).readAsBytesSync(), verify: true);
-      var zip = new ZipEncoder().encode(cloneArchive(archive));
+      var archive = ZipDecoder().decodeBytes(File(input).readAsBytesSync(), verify: true);
+      var zip = ZipEncoder().encode(cloneArchive(archive));
       try {
-        archive = new ZipDecoder().decodeBytes(zip, verify: true);
-        var file = new File("test/out/example/${basename(input)}")
+        archive = ZipDecoder().decodeBytes(zip, verify: true);
+        var file = File("test/out/example/${basename(input)}")
           ..createSync(recursive: true)
           ..writeAsBytesSync(zip);
         unzip(file.path);

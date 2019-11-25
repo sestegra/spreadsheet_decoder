@@ -118,7 +118,7 @@ var expectNumbers = <String, List<List>>{
 Map<String, List<List>> copyTables(Map<String, List<List>> tables) {
   var copy = <String, List<List>>{};
   tables.forEach((sheet, table) {
-    copy[sheet] = new List<List>.from(table.map((row) => new List.from(row)));
+    copy[sheet] = List<List>.from(table.map((row) => List.from(row)));
   });
   return copy;
 }
@@ -360,7 +360,7 @@ testUpdateXlsx() {
         var data = first.encode();
         save('test/out/no/default.xlsx', data);
 
-        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        var decoder = SpreadsheetDecoder.decodeBytes(data);
         expect(decoder.tables.length, 3);
         expect(decoder.tables['Sheet1'].rows, []);
         expect(decoder.tables['Sheet2'].rows, []);
@@ -372,7 +372,7 @@ testUpdateXlsx() {
         var data = first.encode();
         save('test/out/no/test.xlsx', data);
 
-        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        var decoder = SpreadsheetDecoder.decodeBytes(data);
         expect(decoder.tables.length, expectedTest.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedTest[name]);
@@ -384,7 +384,7 @@ testUpdateXlsx() {
         var data = first.encode();
         save('test/out/no/perl.xlsx', data);
 
-        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        var decoder = SpreadsheetDecoder.decodeBytes(data);
         expect(decoder.tables.length, expectedPerl.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedPerl[name]);
@@ -396,7 +396,7 @@ testUpdateXlsx() {
         var data = first.encode();
         save('test/out/no/format.xlsx', data);
 
-        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        var decoder = SpreadsheetDecoder.decodeBytes(data);
         expect(decoder.tables.length, expectedFormat.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedFormat[name]);
@@ -408,7 +408,7 @@ testUpdateXlsx() {
         var data = first.encode();
         save('test/out/no/empty_column.xlsx', data);
 
-        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        var decoder = SpreadsheetDecoder.decodeBytes(data);
         expect(decoder.tables.length, expectedEmptyColumn.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedEmptyColumn[name]);
@@ -420,7 +420,7 @@ testUpdateXlsx() {
         expect(xlsx.extension, '.xlsx');
         var data = xlsx.dataUrl();
 
-        var decoder = new SpreadsheetDecoder.decodeBytes(base64Decode(data.split(',').last));
+        var decoder = SpreadsheetDecoder.decodeBytes(base64Decode(data.split(',').last));
         expect(decoder.tables.length, expectedTest.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedTest[name]);
@@ -444,7 +444,7 @@ testUpdateXlsx() {
         var data = first.encode();
         save('test/out/update/perl.xlsx', data);
 
-        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        var decoder = SpreadsheetDecoder.decodeBytes(data);
         expect(decoder.tables.length, expectedPerlAfterUpdate.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedPerlAfterUpdate[name]);
@@ -466,7 +466,7 @@ testUpdateXlsx() {
         var data = first.encode();
         save('test/out/update/perl.xlsx', data);
 
-        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        var decoder = SpreadsheetDecoder.decodeBytes(data);
         expect(decoder.tables.length, expectedPerlAfterUpdate.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedPerlAfterUpdate[name]);
@@ -488,7 +488,7 @@ testUpdateXlsx() {
         var data = first.encode();
         save('test/out/update/perl.xlsx', data);
 
-        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        var decoder = SpreadsheetDecoder.decodeBytes(data);
         expect(decoder.tables.length, expectedPerlAfterUpdate.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedPerlAfterUpdate[name]);
@@ -503,7 +503,7 @@ testUpdateXlsx() {
           var data = first.encode();
           save('test/out/update/test.xlsx', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].insert(0, [null, null, null]);
 
@@ -520,7 +520,7 @@ testUpdateXlsx() {
           var data = first.encode();
           save('test/out/update/test.xlsx', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].add(['insert', null, null]);
 
@@ -535,7 +535,7 @@ testUpdateXlsx() {
           var data = first.encode();
           save('test/out/update/test.xlsx', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].insert(10, [null, null, null]);
 
@@ -553,7 +553,7 @@ testUpdateXlsx() {
           var data = first.encode();
           save('test/out/update/test.xlsx', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['EMPTY'].insert(0, ['42']);
 
@@ -582,7 +582,7 @@ testUpdateXlsx() {
           var data = first.encode();
           save('test/out/update/test.xlsx', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].removeAt(0);
 
@@ -597,7 +597,7 @@ testUpdateXlsx() {
           var data = first.encode();
           save('test/out/update/test.xlsx', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].removeAt(11);
 
@@ -612,7 +612,7 @@ testUpdateXlsx() {
           var data = first.encode();
           save('test/out/update/test.xlsx', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].removeAt(10);
 
@@ -643,7 +643,7 @@ testUpdateXlsx() {
           var data = first.encode();
           save('test/out/update/test.xlsx', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].forEach((row) {
             row.insert(0, null);
@@ -662,7 +662,7 @@ testUpdateXlsx() {
           var data = first.encode();
           save('test/out/update/test.xlsx', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].forEach((row) {
             row.add(null);
@@ -680,7 +680,7 @@ testUpdateXlsx() {
           var data = first.encode();
           save('test/out/update/test.xlsx', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].forEach((row) {
             row.insert(1, null);
@@ -711,7 +711,7 @@ testUpdateXlsx() {
           var data = first.encode();
           save('test/out/update/test.xlsx', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].forEach((row) {
             row.removeAt(0);
@@ -728,7 +728,7 @@ testUpdateXlsx() {
           var data = first.encode();
           save('test/out/update/test.xlsx', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].forEach((row) {
             row.removeAt(2);
@@ -745,7 +745,7 @@ testUpdateXlsx() {
           var data = first.encode();
           save('test/out/update/test.xlsx', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].forEach((row) {
             row.removeAt(1);
@@ -781,7 +781,7 @@ testUpdateOds() {
         var data = first.encode();
         save('test/out/no/default.ods', data);
 
-        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        var decoder = SpreadsheetDecoder.decodeBytes(data);
         expect(decoder.tables.length, 1);
         expect(decoder.tables['Sheet1'].rows, []);
       });
@@ -791,7 +791,7 @@ testUpdateOds() {
         var data = first.encode();
         save('test/out/no/test.ods', data);
 
-        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        var decoder = SpreadsheetDecoder.decodeBytes(data);
         expect(decoder.tables.length, expectedTest.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedTest[name]);
@@ -803,7 +803,7 @@ testUpdateOds() {
         var data = first.encode();
         save('test/out/no/perl.ods', data);
 
-        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        var decoder = SpreadsheetDecoder.decodeBytes(data);
         expect(decoder.tables.length, expectedPerl.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedPerl[name]);
@@ -815,7 +815,7 @@ testUpdateOds() {
         var data = first.encode();
         save('test/out/no/format.ods', data);
 
-        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        var decoder = SpreadsheetDecoder.decodeBytes(data);
         expect(decoder.tables.length, expectedFormat.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedFormat[name]);
@@ -827,7 +827,7 @@ testUpdateOds() {
         var data = first.encode();
         save('test/out/no/empty_column.ods', data);
 
-        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        var decoder = SpreadsheetDecoder.decodeBytes(data);
         expect(decoder.tables.length, expectedEmptyColumn.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedEmptyColumn[name]);
@@ -839,7 +839,7 @@ testUpdateOds() {
         expect(ods.extension, '.ods');
         var data = ods.dataUrl();
 
-        var decoder = new SpreadsheetDecoder.decodeBytes(base64Decode(data.split(',').last));
+        var decoder = SpreadsheetDecoder.decodeBytes(base64Decode(data.split(',').last));
         expect(decoder.tables.length, expectedTest.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedTest[name]);
@@ -863,7 +863,7 @@ testUpdateOds() {
         var data = first.encode();
         save('test/out/update/perl.ods', data);
 
-        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        var decoder = SpreadsheetDecoder.decodeBytes(data);
         expect(decoder.tables.length, expectedPerlAfterUpdate.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedPerlAfterUpdate[name]);
@@ -885,7 +885,7 @@ testUpdateOds() {
         var data = first.encode();
         save('test/out/update/perl.ods', data);
 
-        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        var decoder = SpreadsheetDecoder.decodeBytes(data);
         expect(decoder.tables.length, expectedPerlAfterUpdate.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedPerlAfterUpdate[name]);
@@ -907,7 +907,7 @@ testUpdateOds() {
         var data = first.encode();
         save('test/out/update/perl.ods', data);
 
-        var decoder = new SpreadsheetDecoder.decodeBytes(data);
+        var decoder = SpreadsheetDecoder.decodeBytes(data);
         expect(decoder.tables.length, expectedPerlAfterUpdate.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedPerlAfterUpdate[name]);
@@ -922,7 +922,7 @@ testUpdateOds() {
           var data = first.encode();
           save('test/out/update/test.ods', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].insert(0, [null, null, null]);
 
@@ -939,7 +939,7 @@ testUpdateOds() {
           var data = first.encode();
           save('test/out/update/test.ods', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].add(['insert', null, null]);
 
@@ -954,7 +954,7 @@ testUpdateOds() {
           var data = first.encode();
           save('test/out/update/test.ods', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].insert(10, [null, null, null]);
 
@@ -983,7 +983,7 @@ testUpdateOds() {
           var data = first.encode();
           save('test/out/update/test.ods', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].removeAt(0);
 
@@ -998,7 +998,7 @@ testUpdateOds() {
           var data = first.encode();
           save('test/out/update/test.ods', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].removeAt(11);
 
@@ -1013,7 +1013,7 @@ testUpdateOds() {
           var data = first.encode();
           save('test/out/update/test.ods', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].removeAt(10);
 
@@ -1044,7 +1044,7 @@ testUpdateOds() {
           var data = first.encode();
           save('test/out/update/test.ods', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].forEach((row) {
             row.insert(0, null);
@@ -1063,7 +1063,7 @@ testUpdateOds() {
           var data = first.encode();
           save('test/out/update/test.ods', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].forEach((row) {
             row.add(null);
@@ -1081,7 +1081,7 @@ testUpdateOds() {
           var data = first.encode();
           save('test/out/update/test.ods', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].forEach((row) {
             row.insert(1, null);
@@ -1112,7 +1112,7 @@ testUpdateOds() {
           var data = first.encode();
           save('test/out/update/test.ods', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].forEach((row) {
             row.removeAt(0);
@@ -1129,7 +1129,7 @@ testUpdateOds() {
           var data = first.encode();
           save('test/out/update/test.ods', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].forEach((row) {
             row.removeAt(2);
@@ -1146,7 +1146,7 @@ testUpdateOds() {
           var data = first.encode();
           save('test/out/update/test.ods', data);
 
-          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
           expectedTables['ONE'].forEach((row) {
             row.removeAt(1);
