@@ -49,11 +49,11 @@ SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive, bool update) {
 
   switch (format) {
     case _spreasheetOds:
-      return new OdsDecoder(archive, update: update);
+      return OdsDecoder(archive, update: update);
     case _spreasheetXlsx:
-      return new XlsxDecoder(archive, update: update);
+      return XlsxDecoder(archive, update: update);
     default:
-      throw new UnsupportedError("Spreadsheet format unsupported");
+      throw UnsupportedError("Spreadsheet format unsupported");
   }
 }
 
@@ -88,12 +88,12 @@ abstract class SpreadsheetDecoder {
   SpreadsheetDecoder();
 
   factory SpreadsheetDecoder.decodeBytes(List<int> data, {bool update: false, bool verify: false}) {
-    var archive = new ZipDecoder().decodeBytes(data, verify: verify);
+    var archive = ZipDecoder().decodeBytes(data, verify: verify);
     return _newSpreadsheetDecoder(archive, update);
   }
 
   factory SpreadsheetDecoder.decodeBuffer(InputStream input, {bool update: false, bool verify: false}) {
-    var archive = new ZipDecoder().decodeBuffer(input, verify: verify);
+    var archive = ZipDecoder().decodeBuffer(input, verify: verify);
     return _newSpreadsheetDecoder(archive, update);
   }
 
@@ -102,10 +102,10 @@ abstract class SpreadsheetDecoder {
 
   void _checkSheetArguments(String sheet) {
     if (_update != true) {
-      throw new ArgumentError("'update' should be set to 'true' on constructor");
+      throw ArgumentError("'update' should be set to 'true' on constructor");
     }
     if (_sheets.containsKey(sheet) == false) {
-      throw new ArgumentError("'$sheet' not found");
+      throw ArgumentError("'$sheet' not found");
     }
   }
 
@@ -113,7 +113,7 @@ abstract class SpreadsheetDecoder {
   void insertColumn(String sheet, int columnIndex) {
     _checkSheetArguments(sheet);
     if (columnIndex < 0 || columnIndex > _tables[sheet]._maxCols) {
-      throw new RangeError.range(columnIndex, 0, _tables[sheet]._maxCols);
+      throw RangeError.range(columnIndex, 0, _tables[sheet]._maxCols);
     }
 
     var table = _tables[sheet];
@@ -125,7 +125,7 @@ abstract class SpreadsheetDecoder {
   void removeColumn(String sheet, int columnIndex) {
     _checkSheetArguments(sheet);
     if (columnIndex < 0 || columnIndex >= _tables[sheet]._maxCols) {
-      throw new RangeError.range(columnIndex, 0, _tables[sheet]._maxCols - 1);
+      throw RangeError.range(columnIndex, 0, _tables[sheet]._maxCols - 1);
     }
 
     var table = _tables[sheet];
@@ -137,11 +137,11 @@ abstract class SpreadsheetDecoder {
   void insertRow(String sheet, int rowIndex) {
     _checkSheetArguments(sheet);
     if (rowIndex < 0 || rowIndex > _tables[sheet]._maxRows) {
-      throw new RangeError.range(rowIndex, 0, _tables[sheet]._maxRows);
+      throw RangeError.range(rowIndex, 0, _tables[sheet]._maxRows);
     }
 
     var table = _tables[sheet];
-    table.rows.insert(rowIndex, new List.generate(table._maxCols, (_) => null));
+    table.rows.insert(rowIndex, List.generate(table._maxCols, (_) => null));
     table._maxRows++;
   }
 
@@ -149,7 +149,7 @@ abstract class SpreadsheetDecoder {
   void removeRow(String sheet, int rowIndex) {
     _checkSheetArguments(sheet);
     if (rowIndex < 0 || rowIndex >= _tables[sheet]._maxRows) {
-      throw new RangeError.range(rowIndex, 0, _tables[sheet]._maxRows - 1);
+      throw RangeError.range(rowIndex, 0, _tables[sheet]._maxRows - 1);
     }
 
     var table = _tables[sheet];
@@ -161,10 +161,10 @@ abstract class SpreadsheetDecoder {
   void updateCell(String sheet, int columnIndex, int rowIndex, dynamic value) {
     _checkSheetArguments(sheet);
     if (columnIndex < 0 || columnIndex >= _tables[sheet]._maxCols) {
-      throw new RangeError.range(columnIndex, 0, _tables[sheet]._maxCols - 1);
+      throw RangeError.range(columnIndex, 0, _tables[sheet]._maxCols - 1);
     }
     if (rowIndex < 0 || rowIndex >= _tables[sheet]._maxRows) {
-      throw new RangeError.range(rowIndex, 0, _tables[sheet]._maxRows - 1);
+      throw RangeError.range(rowIndex, 0, _tables[sheet]._maxRows - 1);
     }
 
     _tables[sheet].rows[rowIndex][columnIndex] = value.toString();
@@ -173,27 +173,27 @@ abstract class SpreadsheetDecoder {
   /// Encode bytes after update
   List<int> encode() {
     if (_update != true) {
-      throw new ArgumentError("'update' should be set to 'true' on constructor");
+      throw ArgumentError("'update' should be set to 'true' on constructor");
     }
 
     for (var xmlFile in _xmlFiles.keys) {
       var xml = _xmlFiles[xmlFile].toString();
       var content = utf8.encode(xml);
-      _archiveFiles[xmlFile] = new ArchiveFile(xmlFile, content.length, content);
+      _archiveFiles[xmlFile] = ArchiveFile(xmlFile, content.length, content);
     }
-    return new ZipEncoder().encode(_cloneArchive(_archive));
+    return ZipEncoder().encode(_cloneArchive(_archive));
   }
 
   /// Encode data url
   String dataUrl() {
-    var buffer = new StringBuffer();
+    var buffer = StringBuffer();
     buffer.write("data:${mediaType};base64,");
     buffer.write(base64Encode(encode()));
     return buffer.toString();
   }
 
   Archive _cloneArchive(Archive archive) {
-    var clone = new Archive();
+    var clone = Archive();
     archive.files.forEach((file) {
       if (file.isFile) {
         ArchiveFile copy;
@@ -203,7 +203,7 @@ abstract class SpreadsheetDecoder {
           var content = (file.content as Uint8List).toList();
           //var compress = file.compress;
           var compress = _noCompression.contains(file.name) ? false : true;
-          copy = new ArchiveFile(file.name, content.length, content)..compress = compress;
+          copy = ArchiveFile(file.name, content.length, content)..compress = compress;
         }
         clone.addFile(copy);
       }
@@ -264,7 +264,7 @@ class SpreadsheetTable {
   int _maxRows = 0;
   int _maxCols = 0;
 
-  List<List> _rows = new List<List>();
+  List<List> _rows = List<List>();
 
   /// List of table's rows
   List<List> get rows => _rows;

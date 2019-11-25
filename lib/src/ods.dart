@@ -20,7 +20,7 @@ class OdsDecoder extends SpreadsheetDecoder {
   OdsDecoder(Archive archive, {bool update = false}) {
     this._archive = archive;
     this._update = update;
-    _tables = new Map<String, SpreadsheetTable>();
+    _tables = Map<String, SpreadsheetTable>();
     _parseContent();
   }
 
@@ -116,9 +116,9 @@ class OdsDecoder extends SpreadsheetDecoder {
       _styleNames[family].add(name);
     });
   }
-  
+
   void _parseTable(XmlElement node, String name) {
-    tables[name] = new SpreadsheetTable(name);
+    tables[name] = SpreadsheetTable(name);
     var table = tables[name];
     var rows = _findRows(node);
 
@@ -146,7 +146,7 @@ class OdsDecoder extends SpreadsheetDecoder {
   }
 
   void _parseRow(XmlElement node, SpreadsheetTable table) {
-    var row = new List();
+    var row = List();
     var cells = _findCells(node);
 
     // Remove tailing empty cells
@@ -158,7 +158,7 @@ class OdsDecoder extends SpreadsheetDecoder {
 
     var repeat = _getRowRepeated(node);
     for (var index = 0; index < repeat; index++) {
-      table._rows.add(new List.from(row));
+      table._rows.add(List.from(row));
     }
 
     _countFilledRow(table, row);
@@ -192,11 +192,11 @@ class OdsDecoder extends SpreadsheetDecoder {
       case 'time':
         value = node.getAttribute('office:time-value');
         value = value.substring(2, value.length - 1);
-        value = value.replaceAll(new RegExp('[H|M]'), ':');
+        value = value.replaceAll(RegExp('[H|M]'), ':');
         break;
       case 'string':
       default:
-        var list = new List<String>();
+        var list = List<String>();
         node.findElements('text:p').forEach((child) {
           list.add(_readString(child));
         });
@@ -206,7 +206,7 @@ class OdsDecoder extends SpreadsheetDecoder {
   }
 
   String _readString(XmlElement node) {
-    var buffer = new StringBuffer();
+    var buffer = StringBuffer();
 
     node.children.forEach((child) {
       if (child is XmlElement) {
@@ -338,25 +338,29 @@ class OdsDecoder extends SpreadsheetDecoder {
 
   static XmlElement _createRow(int maxCols, String style) {
     var attributes = <XmlAttribute>[
-      new XmlAttribute(new XmlName('table:style-name'), style),
+      XmlAttribute(XmlName('table:style-name'), style),
     ];
     var children = <XmlNode>[
-      new XmlElement(new XmlName('table:table-cell'), [
-        new XmlAttribute(new XmlName('table:number-columns-repeated'), maxCols.toString()),
+      XmlElement(XmlName('table:table-cell'), [
+        XmlAttribute(XmlName('table:number-columns-repeated'), maxCols.toString()),
       ]),
     ];
-    return new XmlElement(new XmlName('table:table-row'), attributes, children);
+    return XmlElement(XmlName('table:table-row'), attributes, children);
   }
 
   // TODO Manage value's type
   static XmlElement _createCell(dynamic value) {
-    var attributes = value == null ? <XmlAttribute>[] : <XmlAttribute>[
-      new XmlAttribute(new XmlName('office:value-type'), "string"),
-      new XmlAttribute(new XmlName('calcext:value-type'), "string"),
-    ];
-    var children = value == null ? <XmlNode>[] : <XmlNode>[
-      new XmlElement(new XmlName('text:p'), [], [new XmlText(_escape(value.toString()))]),
-    ];
-    return new XmlElement(new XmlName('table:table-cell'), attributes, children);
+    var attributes = value == null
+        ? <XmlAttribute>[]
+        : <XmlAttribute>[
+            XmlAttribute(XmlName('office:value-type'), "string"),
+            XmlAttribute(XmlName('calcext:value-type'), "string"),
+          ];
+    var children = value == null
+        ? <XmlNode>[]
+        : <XmlNode>[
+            XmlElement(XmlName('text:p'), [], [XmlText(_escape(value.toString()))]),
+          ];
+    return XmlElement(XmlName('table:table-cell'), attributes, children);
   }
 }
