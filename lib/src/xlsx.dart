@@ -402,7 +402,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
 
     node.children.forEach((child) {
       if (child is XmlText) {
-        buffer.write(_unescape(child.text));
+        buffer.write(_normalizeNewLine(child.text));
       }
     });
 
@@ -524,7 +524,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
         ? <XmlElement>[]
         : <XmlElement>[
             XmlElement(XmlName('is'), [], [
-              XmlElement(XmlName('t'), [], [XmlText(_escape(value.toString()))])
+              XmlElement(XmlName('t'), [], [XmlText(value.toString())])
             ]),
           ];
     return XmlElement(XmlName('c'), attributes, children);

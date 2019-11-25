@@ -210,9 +210,9 @@ class OdsDecoder extends SpreadsheetDecoder {
 
     node.children.forEach((child) {
       if (child is XmlElement) {
-        buffer.write(_unescape(_readString(child)));
+        buffer.write(_normalizeNewLine(_readString(child)));
       } else if (child is XmlText) {
-        buffer.write(_unescape(child.text));
+        buffer.write(_normalizeNewLine(child.text));
       }
     });
 
@@ -359,7 +359,7 @@ class OdsDecoder extends SpreadsheetDecoder {
     var children = value == null
         ? <XmlNode>[]
         : <XmlNode>[
-            XmlElement(XmlName('text:p'), [], [XmlText(_escape(value.toString()))]),
+            XmlElement(XmlName('text:p'), [], [XmlText(value.toString())]),
           ];
     return XmlElement(XmlName('table:table-cell'), attributes, children);
   }

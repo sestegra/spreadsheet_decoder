@@ -17,7 +17,7 @@ main(List<String> args) {
 
   var sheet = decoder.tables.keys.first;
   decoder
-    ..updateCell(sheet, 0, 0, 1337)
+    ..updateCell(sheet, 0, 0, "L'oiseau <\"coucou\">")
     ..updateCell(sheet, 1, 0, "B")
     ..updateCell(sheet, 2, 0, "C")
     ..updateCell(sheet, 1, 1, 42.3)

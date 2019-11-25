@@ -7,25 +7,9 @@ final Map<String, String> _spreasheetExtensionMap = <String, String>{
   _spreasheetXlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 };
 
-// HTML entities to decode (see here http://books.evc-cit.info/apa.php)
 // Normalize new line
-String _unescape(String text) {
-  return text
-      .replaceAll("&quot;", '"')
-      .replaceAll("&apos;", "'")
-      .replaceAll("&amp;", "&")
-      .replaceAll("&lt;", "<")
-      .replaceAll("&gt;", ">")
-      .replaceAll("\r\n", "\n");
-}
-
-String _escape(String text) {
-  return text
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&apos;")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;");
+String _normalizeNewLine(String text) {
+  return text.replaceAll("\r\n", "\n");
 }
 
 SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive, bool update) {
