@@ -212,13 +212,13 @@ abstract class SpreadsheetDecoder {
   }
 
   _normalizeTable(SpreadsheetTable table) {
-    if (table._maxRows == -1) {
+    if (table._maxRows == 0) {
       table._rows.clear();
     } else if (table._maxRows < table._rows.length) {
       table._rows.removeRange(table._maxRows, table._rows.length);
     }
     for (var row = 0; row < table._rows.length; row++) {
-      if (table._maxCols == -1) {
+      if (table._maxCols == 0) {
         table._rows[row].clear();
       } else if (table._maxCols < table._rows[row].length) {
         table._rows[row].removeRange(table._maxCols, table._rows[row].length);
@@ -261,8 +261,8 @@ class SpreadsheetTable {
   final String name;
   SpreadsheetTable(this.name);
 
-  int _maxRows = -1;
-  int _maxCols = -1;
+  int _maxRows = 0;
+  int _maxCols = 0;
 
   List<List> _rows = new List<List>();
 

@@ -112,7 +112,7 @@ var expectedEmptyColumn = <String, List<List>>{
 var expectNumbers = <String, List<List>>{
   'Blatt 1': [
     ['Tabelle 1']
-    ]
+  ]
 };
 
 Map<String, List<List>> copyTables(Map<String, List<List>> tables) {
@@ -499,9 +499,9 @@ testUpdateXlsx() {
     group('row', () {
       group('insert', () {
         test('at top', () {
-          var first = decode('test.ods', update: true)..insertRow('ONE', 0);
+          var first = decode('test.xlsx', update: true)..insertRow('ONE', 0);
           var data = first.encode();
-          save('test/out/update/test.ods', data);
+          save('test/out/update/test.xlsx', data);
 
           var decoder = new SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
@@ -514,11 +514,11 @@ testUpdateXlsx() {
         });
 
         test('at bottom', () {
-          var first = decode('test.ods', update: true)
+          var first = decode('test.xlsx', update: true)
             ..insertRow('ONE', 12)
             ..updateCell('ONE', 0, 12, 'insert');
           var data = first.encode();
-          save('test/out/update/test.ods', data);
+          save('test/out/update/test.xlsx', data);
 
           var decoder = new SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
@@ -531,9 +531,9 @@ testUpdateXlsx() {
         });
 
         test('in between', () {
-          var first = decode('test.ods', update: true)..insertRow('ONE', 10);
+          var first = decode('test.xlsx', update: true)..insertRow('ONE', 10);
           var data = first.encode();
-          save('test/out/update/test.ods', data);
+          save('test/out/update/test.xlsx', data);
 
           var decoder = new SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
@@ -545,16 +545,34 @@ testUpdateXlsx() {
           });
         });
 
-        test('ArgumentError exception', () {
-          expect(() => decode('test.ods')..insertRow('ONE', 1), throwsArgumentError);
+        test('in empty sheet', () {
+          var first = decode('test.xlsx', update: true)
+            ..insertRow('EMPTY', 0)
+            ..insertColumn('EMPTY', 0)
+            ..updateCell('EMPTY', 0, 0, '42');
+          var data = first.encode();
+          save('test/out/update/test.xlsx', data);
+
+          var decoder = new SpreadsheetDecoder.decodeBytes(data);
+          var expectedTables = copyTables(expectedTest);
+          expectedTables['EMPTY'].insert(0, ['42']);
+
+          expect(decoder.tables.length, expectedTables.keys.length);
+          decoder.tables.forEach((name, table) {
+            expect(table.rows, expectedTables[name]);
+          });
         });
 
         test('ArgumentError exception', () {
-          expect(() => decode('test.ods', update: true)..insertRow('UNKNOWN', 1), throwsArgumentError);
+          expect(() => decode('test.xlsx')..insertRow('ONE', 1), throwsArgumentError);
+        });
+
+        test('ArgumentError exception', () {
+          expect(() => decode('test.xlsx', update: true)..insertRow('UNKNOWN', 1), throwsArgumentError);
         });
 
         test('RangeError exception', () {
-          expect(() => decode('test.ods', update: true)..insertRow('ONE', 13), throwsRangeError);
+          expect(() => decode('test.xlsx', update: true)..insertRow('ONE', 13), throwsRangeError);
         });
       });
 
