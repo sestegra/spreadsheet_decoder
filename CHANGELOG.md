@@ -1,3 +1,7 @@
+## 1.1.0
+Fix insertion on empty sheet
+Fix unnecessary string escape
+
 ## 1.0.1
 Fix parsing on converted Numbers documents
 
