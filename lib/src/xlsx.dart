@@ -348,6 +348,8 @@ class XlsxDecoder extends SpreadsheetDecoder {
       case 'b':
         value = _parseValue(node.findElements('v').first) == '1';
         break;
+      // error
+      case 'e': 
       // formula
       case 'str':
         // <c r="C6" s="1" vm="15" t="str">
