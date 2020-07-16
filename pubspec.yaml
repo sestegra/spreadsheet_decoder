@@ -9,9 +9,9 @@ environment:
   sdk: '>=2.0.0-dev.67.0 <3.0.0'
 
 dependencies:
-  archive: ^2.0.0
-  xml: ^3.0.0
+  archive: ^2.0.13
+  xml: ^4.2.0
 
 dev_dependencies:
-  path: ^1.5.1
-  test: ^1.2.0
+  path: ^1.7.0
+  test: ^1.15.3
