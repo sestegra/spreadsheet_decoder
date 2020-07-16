@@ -59,9 +59,9 @@ var expectedPerl = <String, List<List>>{
 
 var expectedPerlAfterUpdate = <String, List<List>>{
   'Sheet1': [
-    ["0x0", "1x0", "2x0"],
-    ["0x1", "1x1", "2x1"],
-    ["0x2", "1x2", "2x2"],
+    ['0x0', '1x0', '2x0'],
+    ['0x1', '1x1', '2x1'],
+    ['0x2', '1x2', '2x2'],
   ],
   'Sheet2': [],
   'Sheet3': [
@@ -70,7 +70,7 @@ var expectedPerlAfterUpdate = <String, List<List>>{
     [null, null, null],
     [null, null, null],
     [null, null, null],
-    [null, "Cell B6", null],
+    [null, 'Cell B6', null],
     [null, null, null],
     [null, null, null],
     [null, null, null],
@@ -123,7 +123,7 @@ Map<String, List<List>> copyTables(Map<String, List<List>> tables) {
   return copy;
 }
 
-testUnsupported() {
+void testUnsupported() {
   test('Unsupported file', () {
     var decoder;
     try {
@@ -135,7 +135,7 @@ testUnsupported() {
   });
 }
 
-testXlsx() {
+void testXlsx() {
   group('lettersToNumeric:', () {
     test('Simple capital letter', () {
       expect(lettersToNumeric('A'), 1);
@@ -305,7 +305,7 @@ testXlsx() {
   });
 }
 
-testOds() {
+void testOds() {
   group('ods spreadsheet:', () {
     test('Check format', () {
       var decoder = decode('default.ods');
@@ -352,7 +352,7 @@ testOds() {
   });
 }
 
-testUpdateXlsx() {
+void testUpdateXlsx() {
   group('xlsx spreadsheet update:', () {
     group('No update', () {
       test('Empty file', () {
@@ -420,7 +420,8 @@ testUpdateXlsx() {
         expect(xlsx.extension, '.xlsx');
         var data = xlsx.dataUrl();
 
-        var decoder = SpreadsheetDecoder.decodeBytes(base64Decode(data.split(',').last));
+        var decoder =
+            SpreadsheetDecoder.decodeBytes(base64Decode(data.split(',').last));
         expect(decoder.tables.length, expectedTest.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedTest[name]);
@@ -431,16 +432,16 @@ testUpdateXlsx() {
     group('Update', () {
       test('Perl file #1', () {
         var first = decode('perl.xlsx', update: true)
-          ..updateCell('Sheet1', 0, 0, "0x0")
-          ..updateCell('Sheet1', 1, 0, "1x0")
-          ..updateCell('Sheet1', 2, 0, "2x0")
-          ..updateCell('Sheet1', 0, 1, "0x1")
-          ..updateCell('Sheet1', 1, 1, "1x1")
-          ..updateCell('Sheet1', 2, 1, "2x1")
-          ..updateCell('Sheet1', 0, 2, "0x2")
-          ..updateCell('Sheet1', 1, 2, "1x2")
-          ..updateCell('Sheet1', 2, 2, "2x2")
-          ..updateCell('Sheet3', 1, 5, "Cell B6");
+          ..updateCell('Sheet1', 0, 0, '0x0')
+          ..updateCell('Sheet1', 1, 0, '1x0')
+          ..updateCell('Sheet1', 2, 0, '2x0')
+          ..updateCell('Sheet1', 0, 1, '0x1')
+          ..updateCell('Sheet1', 1, 1, '1x1')
+          ..updateCell('Sheet1', 2, 1, '2x1')
+          ..updateCell('Sheet1', 0, 2, '0x2')
+          ..updateCell('Sheet1', 1, 2, '1x2')
+          ..updateCell('Sheet1', 2, 2, '2x2')
+          ..updateCell('Sheet3', 1, 5, 'Cell B6');
         var data = first.encode();
         save('test/out/update/perl.xlsx', data);
 
@@ -453,16 +454,16 @@ testUpdateXlsx() {
 
       test('Perl file #2', () {
         var first = decode('perl.xlsx', update: true)
-          ..updateCell('Sheet1', 2, 0, "2x0")
-          ..updateCell('Sheet1', 1, 0, "1x0")
-          ..updateCell('Sheet1', 0, 0, "0x0")
-          ..updateCell('Sheet1', 2, 1, "2x1")
-          ..updateCell('Sheet1', 1, 1, "1x1")
-          ..updateCell('Sheet1', 0, 1, "0x1")
-          ..updateCell('Sheet1', 2, 2, "2x2")
-          ..updateCell('Sheet1', 1, 2, "1x2")
-          ..updateCell('Sheet1', 0, 2, "0x2")
-          ..updateCell('Sheet3', 1, 5, "Cell B6");
+          ..updateCell('Sheet1', 2, 0, '2x0')
+          ..updateCell('Sheet1', 1, 0, '1x0')
+          ..updateCell('Sheet1', 0, 0, '0x0')
+          ..updateCell('Sheet1', 2, 1, '2x1')
+          ..updateCell('Sheet1', 1, 1, '1x1')
+          ..updateCell('Sheet1', 0, 1, '0x1')
+          ..updateCell('Sheet1', 2, 2, '2x2')
+          ..updateCell('Sheet1', 1, 2, '1x2')
+          ..updateCell('Sheet1', 0, 2, '0x2')
+          ..updateCell('Sheet3', 1, 5, 'Cell B6');
         var data = first.encode();
         save('test/out/update/perl.xlsx', data);
 
@@ -475,16 +476,16 @@ testUpdateXlsx() {
 
       test('Perl file #3', () {
         var first = decode('perl.xlsx', update: true)
-          ..updateCell('Sheet1', 1, 0, "1x0")
-          ..updateCell('Sheet1', 2, 0, "2x0")
-          ..updateCell('Sheet1', 0, 0, "0x0")
-          ..updateCell('Sheet1', 1, 1, "1x1")
-          ..updateCell('Sheet1', 2, 1, "2x1")
-          ..updateCell('Sheet1', 0, 1, "0x1")
-          ..updateCell('Sheet1', 1, 2, "1x2")
-          ..updateCell('Sheet1', 2, 2, "2x2")
-          ..updateCell('Sheet1', 0, 2, "0x2")
-          ..updateCell('Sheet3', 1, 5, "Cell B6");
+          ..updateCell('Sheet1', 1, 0, '1x0')
+          ..updateCell('Sheet1', 2, 0, '2x0')
+          ..updateCell('Sheet1', 0, 0, '0x0')
+          ..updateCell('Sheet1', 1, 1, '1x1')
+          ..updateCell('Sheet1', 2, 1, '2x1')
+          ..updateCell('Sheet1', 0, 1, '0x1')
+          ..updateCell('Sheet1', 1, 2, '1x2')
+          ..updateCell('Sheet1', 2, 2, '2x2')
+          ..updateCell('Sheet1', 0, 2, '0x2')
+          ..updateCell('Sheet3', 1, 5, 'Cell B6');
         var data = first.encode();
         save('test/out/update/perl.xlsx', data);
 
@@ -564,15 +565,19 @@ testUpdateXlsx() {
         });
 
         test('ArgumentError exception', () {
-          expect(() => decode('test.xlsx')..insertRow('ONE', 1), throwsArgumentError);
+          expect(() => decode('test.xlsx')..insertRow('ONE', 1),
+              throwsArgumentError);
         });
 
         test('ArgumentError exception', () {
-          expect(() => decode('test.xlsx', update: true)..insertRow('UNKNOWN', 1), throwsArgumentError);
+          expect(
+              () => decode('test.xlsx', update: true)..insertRow('UNKNOWN', 1),
+              throwsArgumentError);
         });
 
         test('RangeError exception', () {
-          expect(() => decode('test.xlsx', update: true)..insertRow('ONE', 13), throwsRangeError);
+          expect(() => decode('test.xlsx', update: true)..insertRow('ONE', 13),
+              throwsRangeError);
         });
       });
 
@@ -623,15 +628,19 @@ testUpdateXlsx() {
         });
 
         test('ArgumentError exception', () {
-          expect(() => decode('test.xlsx')..removeRow('ONE', 1), throwsArgumentError);
+          expect(() => decode('test.xlsx')..removeRow('ONE', 1),
+              throwsArgumentError);
         });
 
         test('ArgumentError exception', () {
-          expect(() => decode('test.xlsx', update: true)..removeRow('UNKNOWN', 1), throwsArgumentError);
+          expect(
+              () => decode('test.xlsx', update: true)..removeRow('UNKNOWN', 1),
+              throwsArgumentError);
         });
 
         test('RangeError exception', () {
-          expect(() => decode('test.xlsx', update: true)..removeRow('ONE', 13), throwsRangeError);
+          expect(() => decode('test.xlsx', update: true)..removeRow('ONE', 13),
+              throwsRangeError);
         });
       });
     });
@@ -693,15 +702,21 @@ testUpdateXlsx() {
         });
 
         test('ArgumentError exception', () {
-          expect(() => decode('test.xlsx')..insertColumn('ONE', 1), throwsArgumentError);
+          expect(() => decode('test.xlsx')..insertColumn('ONE', 1),
+              throwsArgumentError);
         });
 
         test('ArgumentError exception', () {
-          expect(() => decode('test.xlsx', update: true)..insertColumn('UNKNOWN', 1), throwsArgumentError);
+          expect(
+              () =>
+                  decode('test.xlsx', update: true)..insertColumn('UNKNOWN', 1),
+              throwsArgumentError);
         });
 
         test('RangeError exception', () {
-          expect(() => decode('test.xlsx', update: true)..insertColumn('ONE', 13), throwsRangeError);
+          expect(
+              () => decode('test.xlsx', update: true)..insertColumn('ONE', 13),
+              throwsRangeError);
         });
       });
 
@@ -758,22 +773,28 @@ testUpdateXlsx() {
         });
 
         test('ArgumentError exception', () {
-          expect(() => decode('test.xlsx')..removeColumn('ONE', 1), throwsArgumentError);
+          expect(() => decode('test.xlsx')..removeColumn('ONE', 1),
+              throwsArgumentError);
         });
 
         test('ArgumentError exception', () {
-          expect(() => decode('test.xlsx', update: true)..removeColumn('UNKNOWN', 1), throwsArgumentError);
+          expect(
+              () =>
+                  decode('test.xlsx', update: true)..removeColumn('UNKNOWN', 1),
+              throwsArgumentError);
         });
 
         test('RangeError exception', () {
-          expect(() => decode('test.xlsx', update: true)..removeColumn('ONE', 13), throwsRangeError);
+          expect(
+              () => decode('test.xlsx', update: true)..removeColumn('ONE', 13),
+              throwsRangeError);
         });
       });
     });
   });
 }
 
-testUpdateOds() {
+void testUpdateOds() {
   group('ods spreadsheet update:', () {
     group('No update', () {
       test('Empty file', () {
@@ -839,7 +860,8 @@ testUpdateOds() {
         expect(ods.extension, '.ods');
         var data = ods.dataUrl();
 
-        var decoder = SpreadsheetDecoder.decodeBytes(base64Decode(data.split(',').last));
+        var decoder =
+            SpreadsheetDecoder.decodeBytes(base64Decode(data.split(',').last));
         expect(decoder.tables.length, expectedTest.keys.length);
         decoder.tables.forEach((name, table) {
           expect(table.rows, expectedTest[name]);
@@ -850,16 +872,16 @@ testUpdateOds() {
     group('Update', () {
       test('Perl file #1', () {
         var first = decode('perl.ods', update: true)
-          ..updateCell('Sheet1', 0, 0, "0x0")
-          ..updateCell('Sheet1', 1, 0, "1x0")
-          ..updateCell('Sheet1', 2, 0, "2x0")
-          ..updateCell('Sheet1', 0, 1, "0x1")
-          ..updateCell('Sheet1', 1, 1, "1x1")
-          ..updateCell('Sheet1', 2, 1, "2x1")
-          ..updateCell('Sheet1', 0, 2, "0x2")
-          ..updateCell('Sheet1', 1, 2, "1x2")
-          ..updateCell('Sheet1', 2, 2, "2x2")
-          ..updateCell('Sheet3', 1, 5, "Cell B6");
+          ..updateCell('Sheet1', 0, 0, '0x0')
+          ..updateCell('Sheet1', 1, 0, '1x0')
+          ..updateCell('Sheet1', 2, 0, '2x0')
+          ..updateCell('Sheet1', 0, 1, '0x1')
+          ..updateCell('Sheet1', 1, 1, '1x1')
+          ..updateCell('Sheet1', 2, 1, '2x1')
+          ..updateCell('Sheet1', 0, 2, '0x2')
+          ..updateCell('Sheet1', 1, 2, '1x2')
+          ..updateCell('Sheet1', 2, 2, '2x2')
+          ..updateCell('Sheet3', 1, 5, 'Cell B6');
         var data = first.encode();
         save('test/out/update/perl.ods', data);
 
@@ -872,16 +894,16 @@ testUpdateOds() {
 
       test('Perl file #2', () {
         var first = decode('perl.ods', update: true)
-          ..updateCell('Sheet1', 2, 0, "2x0")
-          ..updateCell('Sheet1', 1, 0, "1x0")
-          ..updateCell('Sheet1', 0, 0, "0x0")
-          ..updateCell('Sheet1', 2, 1, "2x1")
-          ..updateCell('Sheet1', 1, 1, "1x1")
-          ..updateCell('Sheet1', 0, 1, "0x1")
-          ..updateCell('Sheet1', 2, 2, "2x2")
-          ..updateCell('Sheet1', 1, 2, "1x2")
-          ..updateCell('Sheet1', 0, 2, "0x2")
-          ..updateCell('Sheet3', 1, 5, "Cell B6");
+          ..updateCell('Sheet1', 2, 0, '2x0')
+          ..updateCell('Sheet1', 1, 0, '1x0')
+          ..updateCell('Sheet1', 0, 0, '0x0')
+          ..updateCell('Sheet1', 2, 1, '2x1')
+          ..updateCell('Sheet1', 1, 1, '1x1')
+          ..updateCell('Sheet1', 0, 1, '0x1')
+          ..updateCell('Sheet1', 2, 2, '2x2')
+          ..updateCell('Sheet1', 1, 2, '1x2')
+          ..updateCell('Sheet1', 0, 2, '0x2')
+          ..updateCell('Sheet3', 1, 5, 'Cell B6');
         var data = first.encode();
         save('test/out/update/perl.ods', data);
 
@@ -894,16 +916,16 @@ testUpdateOds() {
 
       test('Perl file #3', () {
         var first = decode('perl.ods', update: true)
-          ..updateCell('Sheet1', 1, 0, "1x0")
-          ..updateCell('Sheet1', 2, 0, "2x0")
-          ..updateCell('Sheet1', 0, 0, "0x0")
-          ..updateCell('Sheet1', 1, 1, "1x1")
-          ..updateCell('Sheet1', 2, 1, "2x1")
-          ..updateCell('Sheet1', 0, 1, "0x1")
-          ..updateCell('Sheet1', 1, 2, "1x2")
-          ..updateCell('Sheet1', 2, 2, "2x2")
-          ..updateCell('Sheet1', 0, 2, "0x2")
-          ..updateCell('Sheet3', 1, 5, "Cell B6");
+          ..updateCell('Sheet1', 1, 0, '1x0')
+          ..updateCell('Sheet1', 2, 0, '2x0')
+          ..updateCell('Sheet1', 0, 0, '0x0')
+          ..updateCell('Sheet1', 1, 1, '1x1')
+          ..updateCell('Sheet1', 2, 1, '2x1')
+          ..updateCell('Sheet1', 0, 1, '0x1')
+          ..updateCell('Sheet1', 1, 2, '1x2')
+          ..updateCell('Sheet1', 2, 2, '2x2')
+          ..updateCell('Sheet1', 0, 2, '0x2')
+          ..updateCell('Sheet3', 1, 5, 'Cell B6');
         var data = first.encode();
         save('test/out/update/perl.ods', data);
 
@@ -965,15 +987,19 @@ testUpdateOds() {
         });
 
         test('ArgumentError exception', () {
-          expect(() => decode('test.ods')..insertRow('ONE', 1), throwsArgumentError);
+          expect(() => decode('test.ods')..insertRow('ONE', 1),
+              throwsArgumentError);
         });
 
         test('ArgumentError exception', () {
-          expect(() => decode('test.ods', update: true)..insertRow('UNKNOWN', 1), throwsArgumentError);
+          expect(
+              () => decode('test.ods', update: true)..insertRow('UNKNOWN', 1),
+              throwsArgumentError);
         });
 
         test('RangeError exception', () {
-          expect(() => decode('test.ods', update: true)..insertRow('ONE', 13), throwsRangeError);
+          expect(() => decode('test.ods', update: true)..insertRow('ONE', 13),
+              throwsRangeError);
         });
       });
 
@@ -1024,15 +1050,19 @@ testUpdateOds() {
         });
 
         test('ArgumentError exception', () {
-          expect(() => decode('test.ods')..removeRow('ONE', 1), throwsArgumentError);
+          expect(() => decode('test.ods')..removeRow('ONE', 1),
+              throwsArgumentError);
         });
 
         test('ArgumentError exception', () {
-          expect(() => decode('test.ods', update: true)..removeRow('UNKNOWN', 1), throwsArgumentError);
+          expect(
+              () => decode('test.ods', update: true)..removeRow('UNKNOWN', 1),
+              throwsArgumentError);
         });
 
         test('RangeError exception', () {
-          expect(() => decode('test.ods', update: true)..removeRow('ONE', 13), throwsRangeError);
+          expect(() => decode('test.ods', update: true)..removeRow('ONE', 13),
+              throwsRangeError);
         });
       });
     });
@@ -1094,15 +1124,21 @@ testUpdateOds() {
         });
 
         test('ArgumentError exception', () {
-          expect(() => decode('test.ods')..insertColumn('ONE', 1), throwsArgumentError);
+          expect(() => decode('test.ods')..insertColumn('ONE', 1),
+              throwsArgumentError);
         });
 
         test('ArgumentError exception', () {
-          expect(() => decode('test.ods', update: true)..insertColumn('UNKNOWN', 1), throwsArgumentError);
+          expect(
+              () =>
+                  decode('test.ods', update: true)..insertColumn('UNKNOWN', 1),
+              throwsArgumentError);
         });
 
         test('RangeError exception', () {
-          expect(() => decode('test.ods', update: true)..insertColumn('ONE', 13), throwsRangeError);
+          expect(
+              () => decode('test.ods', update: true)..insertColumn('ONE', 13),
+              throwsRangeError);
         });
       });
 
@@ -1159,15 +1195,21 @@ testUpdateOds() {
         });
 
         test('ArgumentError exception', () {
-          expect(() => decode('test.ods')..removeColumn('ONE', 1), throwsArgumentError);
+          expect(() => decode('test.ods')..removeColumn('ONE', 1),
+              throwsArgumentError);
         });
 
         test('ArgumentError exception', () {
-          expect(() => decode('test.ods', update: true)..removeColumn('UNKNOWN', 1), throwsArgumentError);
+          expect(
+              () =>
+                  decode('test.ods', update: true)..removeColumn('UNKNOWN', 1),
+              throwsArgumentError);
         });
 
         test('RangeError exception', () {
-          expect(() => decode('test.ods', update: true)..removeColumn('ONE', 13), throwsRangeError);
+          expect(
+              () => decode('test.ods', update: true)..removeColumn('ONE', 13),
+              throwsRangeError);
         });
       });
     });

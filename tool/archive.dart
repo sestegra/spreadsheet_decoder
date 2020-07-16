@@ -8,7 +8,8 @@ Archive cloneArchive(Archive archive) {
   archive.files.forEach((file) {
     if (file.isFile) {
       var content = (file.content as Uint8List).toList();
-      var copy = ArchiveFile(file.name, content.length, content)..compress = file.compress;
+      var copy = ArchiveFile(file.name, content.length, content)
+        ..compress = file.compress;
       clone.addFile(copy);
     }
   });
@@ -16,13 +17,13 @@ Archive cloneArchive(Archive archive) {
 }
 
 void unzip(String path) {
-  var unzip = Process.runSync("unzip", ["-t", path]);
+  var unzip = Process.runSync('unzip', ['-t', path]);
   print(unzip.stdout);
   print(unzip.stderr);
 }
 
 void binwalk(String path) {
-  var binwalk = Process.runSync("binwalk", [path]);
+  var binwalk = Process.runSync('binwalk', [path]);
   print(binwalk.stdout);
   print(binwalk.stderr);
 }
@@ -34,17 +35,18 @@ void main(List<String> args) {
     if (file is File) {
       var input = file.path;
       print(input);
-      var archive = ZipDecoder().decodeBytes(File(input).readAsBytesSync(), verify: true);
+      var archive =
+          ZipDecoder().decodeBytes(File(input).readAsBytesSync(), verify: true);
       var zip = ZipEncoder().encode(cloneArchive(archive));
       try {
         archive = ZipDecoder().decodeBytes(zip, verify: true);
-        var file = File("test/out/example/${basename(input)}")
+        var file = File('test/out/example/${basename(input)}')
           ..createSync(recursive: true)
           ..writeAsBytesSync(zip);
         unzip(file.path);
         binwalk(file.path);
       } catch (e) {
-        print("$input: KO");
+        print('$input: KO');
       }
     }
   }

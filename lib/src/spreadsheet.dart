@@ -4,12 +4,13 @@ const _spreasheetOds = 'ods';
 const _spreasheetXlsx = 'xlsx';
 final Map<String, String> _spreasheetExtensionMap = <String, String>{
   _spreasheetOds: 'application/vnd.oasis.opendocument.spreadsheet',
-  _spreasheetXlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  _spreasheetXlsx:
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 };
 
 // Normalize new line
 String _normalizeNewLine(String text) {
-  return text.replaceAll("\r\n", "\n");
+  return text.replaceAll('\r\n', '\n');
 }
 
 SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive, bool update) {
@@ -37,20 +38,18 @@ SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive, bool update) {
     case _spreasheetXlsx:
       return XlsxDecoder(archive, update: update);
     default:
-      throw UnsupportedError("Spreadsheet format unsupported");
+      throw UnsupportedError('Spreadsheet format unsupported');
   }
 }
 
 // Issue on archive
 // https://github.com/brendan-duncan/archive/pull/43
-const List<String> _noCompression = const <String>[
+const List<String> _noCompression = <String>[
   'mimetype',
   'Thumbnails/thumbnail.png',
 ];
 
-/**
- * Decode a spreadsheet file.
- */
+/// Decode a spreadsheet file.
 abstract class SpreadsheetDecoder {
   bool _update;
   Archive _archive;
@@ -71,12 +70,14 @@ abstract class SpreadsheetDecoder {
 
   SpreadsheetDecoder();
 
-  factory SpreadsheetDecoder.decodeBytes(List<int> data, {bool update: false, bool verify: false}) {
+  factory SpreadsheetDecoder.decodeBytes(List<int> data,
+      {bool update = false, bool verify = false}) {
     var archive = ZipDecoder().decodeBytes(data, verify: verify);
     return _newSpreadsheetDecoder(archive, update);
   }
 
-  factory SpreadsheetDecoder.decodeBuffer(InputStream input, {bool update: false, bool verify: false}) {
+  factory SpreadsheetDecoder.decodeBuffer(InputStream input,
+      {bool update = false, bool verify = false}) {
     var archive = ZipDecoder().decodeBuffer(input, verify: verify);
     return _newSpreadsheetDecoder(archive, update);
   }
@@ -171,7 +172,7 @@ abstract class SpreadsheetDecoder {
   /// Encode data url
   String dataUrl() {
     var buffer = StringBuffer();
-    buffer.write("data:${mediaType};base64,");
+    buffer.write('data:${mediaType};base64,');
     buffer.write(base64Encode(encode()));
     return buffer.toString();
   }
@@ -187,7 +188,8 @@ abstract class SpreadsheetDecoder {
           var content = (file.content as Uint8List).toList();
           //var compress = file.compress;
           var compress = _noCompression.contains(file.name) ? false : true;
-          copy = ArchiveFile(file.name, content.length, content)..compress = compress;
+          copy = ArchiveFile(file.name, content.length, content)
+            ..compress = compress;
         }
         clone.addFile(copy);
       }
@@ -195,7 +197,7 @@ abstract class SpreadsheetDecoder {
     return clone;
   }
 
-  _normalizeTable(SpreadsheetTable table) {
+  void _normalizeTable(SpreadsheetTable table) {
     if (table._maxRows == 0) {
       table._rows.clear();
     } else if (table._maxRows < table._rows.length) {
@@ -223,7 +225,7 @@ abstract class SpreadsheetDecoder {
     return !_isEmptyRow(row);
   }
 
-  _countFilledRow(SpreadsheetTable table, List row) {
+  void _countFilledRow(SpreadsheetTable table, List row) {
     if (_isNotEmptyRow(row)) {
       if (table._maxRows < table._rows.length) {
         table._maxRows = table._rows.length;
@@ -231,7 +233,7 @@ abstract class SpreadsheetDecoder {
     }
   }
 
-  _countFilledColumn(SpreadsheetTable table, List row, dynamic value) {
+  void _countFilledColumn(SpreadsheetTable table, List row, dynamic value) {
     if (value != null) {
       if (table._maxCols < row.length) {
         table._maxCols = row.length;
@@ -248,7 +250,7 @@ class SpreadsheetTable {
   int _maxRows = 0;
   int _maxCols = 0;
 
-  List<List> _rows = List<List>();
+  final List<List> _rows = <List>[];
 
   /// List of table's rows
   List<List> get rows => _rows;

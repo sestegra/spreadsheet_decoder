@@ -1,10 +1,13 @@
 part of spreadsheet_decoder;
 
-const String _relationships = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
-const String _relationshipsStyles = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles";
-const String _relationshipsWorksheet = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet";
+const String _relationships =
+    'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+const String _relationshipsStyles =
+    'http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles';
+const String _relationshipsWorksheet =
+    'http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet';
 const String _relationshipsSharedStrings =
-    "http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings";
+    'http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings';
 
 /// Convert a character based column
 int lettersToNumeric(String letters) {
@@ -68,16 +71,17 @@ int _letterOnly(int rune) {
 
 String _twoDigits(int n) {
   if (n >= 10) {
-    return "${n}";
+    return '${n}';
   }
-  return "0${n}";
+  return '0${n}';
 }
 
 /// Returns the coordinates from a cell name.
 /// "A1" returns [1, 1] and the "B3" return [2, 3].
 List cellCoordsFromCellId(String cellId) {
   var letters = cellId.runes.map(_letterOnly);
-  var lettersPart = utf8.decode(letters.where((rune) => rune > 0).toList(growable: false));
+  var lettersPart =
+      utf8.decode(letters.where((rune) => rune > 0).toList(growable: false));
   var numericsPart = cellId.substring(lettersPart.length);
   var x = lettersToNumeric(lettersPart);
   var y = int.parse(numericsPart);
@@ -86,30 +90,34 @@ List cellCoordsFromCellId(String cellId) {
 
 /// Read and parse XSLX spreadsheet
 class XlsxDecoder extends SpreadsheetDecoder {
-  String get mediaType => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-  String get extension => ".xlsx";
+  @override
+  String get mediaType =>
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  @override
+  String get extension => '.xlsx';
 
-  List<String> _sharedStrings = List<String>();
-  List<int> _numFormats = List<int>();
+  final List<String> _sharedStrings = <String>[];
+  final List<int> _numFormats = <int>[];
   String _stylesTarget;
   String _sharedStringsTarget;
-  Map<String, String> _worksheetTargets = Map<String, String>();
+  final Map<String, String> _worksheetTargets = <String, String>{};
 
   XlsxDecoder(Archive archive, {bool update = false}) {
-    this._archive = archive;
-    this._update = update;
+    _archive = archive;
+    _update = update;
     if (_update == true) {
       _archiveFiles = <String, ArchiveFile>{};
       _sheets = <String, XmlNode>{};
       _xmlFiles = <String, XmlDocument>{};
     }
-    _tables = Map<String, SpreadsheetTable>();
+    _tables = <String, SpreadsheetTable>{};
     _parseRelations();
     _parseStyles();
     _parseSharedStrings();
     _parseContent();
   }
 
+  @override
   String dumpXmlContent([String sheet]) {
     if (sheet == null) {
       var buffer = StringBuffer();
@@ -123,6 +131,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
     }
   }
 
+  @override
   void insertColumn(String sheet, int columnIndex) {
     super.insertColumn(sheet, columnIndex);
 
@@ -140,12 +149,15 @@ class XlsxDecoder extends SpreadsheetDecoder {
       }
 
       if (cell != null) {
-        cells.skipWhile((c) => c != cell).forEach((c) => _setCellColNumber(c, _getCellNumber(c) + 1));
+        cells
+            .skipWhile((c) => c != cell)
+            .forEach((c) => _setCellColNumber(c, _getCellNumber(c) + 1));
       }
       // Nothing to do if cell == null
     }
   }
 
+  @override
   void removeColumn(String sheet, int columnIndex) {
     super.removeColumn(sheet, columnIndex);
 
@@ -163,12 +175,15 @@ class XlsxDecoder extends SpreadsheetDecoder {
       }
 
       if (cell != null) {
-        cells.skipWhile((c) => c != cell).forEach((c) => _setCellColNumber(c, _getCellNumber(c) - 1));
+        cells
+            .skipWhile((c) => c != cell)
+            .forEach((c) => _setCellColNumber(c, _getCellNumber(c) - 1));
         cell.parent.children.remove(cell);
       }
     }
   }
 
+  @override
   void insertRow(String sheet, int rowIndex) {
     super.insertRow(sheet, rowIndex);
 
@@ -188,6 +203,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
     }
   }
 
+  @override
   void removeRow(String sheet, int rowIndex) {
     super.removeRow(sheet, rowIndex);
 
@@ -203,6 +219,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
     parent.children.remove(foundRow);
   }
 
+  @override
   void updateCell(String sheet, int columnIndex, int rowIndex, dynamic value) {
     super.updateCell(sheet, columnIndex, rowIndex, value);
 
@@ -210,18 +227,19 @@ class XlsxDecoder extends SpreadsheetDecoder {
     _updateCell(foundRow, columnIndex, rowIndex, value);
   }
 
-  _parseRelations() {
+  void _parseRelations() {
     var relations = _archive.findFile('xl/_rels/workbook.xml.rels');
     if (relations != null) {
       relations.decompress();
-      var document = parse(utf8.decode(relations.content));
+      var document = XmlDocument.parse(utf8.decode(relations.content));
       document.findAllElements('Relationship').forEach((node) {
         switch (node.getAttribute('Type')) {
           case _relationshipsStyles:
             _stylesTarget = node.getAttribute('Target');
             break;
           case _relationshipsWorksheet:
-            _worksheetTargets[node.getAttribute('Id')] = node.getAttribute('Target');
+            _worksheetTargets[node.getAttribute('Id')] =
+                node.getAttribute('Target');
             break;
           case _relationshipsSharedStrings:
             _sharedStringsTarget = node.getAttribute('Target');
@@ -231,12 +249,16 @@ class XlsxDecoder extends SpreadsheetDecoder {
     }
   }
 
-  _parseStyles() {
+  void _parseStyles() {
     var styles = _archive.findFile('xl/$_stylesTarget');
     if (styles != null) {
       styles.decompress();
-      var document = parse(utf8.decode(styles.content));
-      document.findAllElements('cellXfs').first.findElements('xf').forEach((node) {
+      var document = XmlDocument.parse(utf8.decode(styles.content));
+      document
+          .findAllElements('cellXfs')
+          .first
+          .findElements('xf')
+          .forEach((node) {
         var numFmtId = node.getAttribute('numFmtId');
         if (numFmtId != null) {
           _numFormats.add(int.parse(numFmtId));
@@ -247,44 +269,45 @@ class XlsxDecoder extends SpreadsheetDecoder {
     }
   }
 
-  _parseSharedStrings() {
+  void _parseSharedStrings() {
     var sharedStrings = _archive.findFile('xl/$_sharedStringsTarget');
     if (sharedStrings != null) {
       sharedStrings.decompress();
-      var document = parse(utf8.decode(sharedStrings.content));
+      var document = XmlDocument.parse(utf8.decode(sharedStrings.content));
       document.findAllElements('si').forEach((node) {
         _parseSharedString(node);
       });
     }
   }
 
-  _parseSharedString(XmlElement node) {
-    var list = List();
+  void _parseSharedString(XmlElement node) {
+    var list = [];
     node.findAllElements('t').forEach((child) {
       list.add(_parseValue(child));
     });
     _sharedStrings.add(list.join(''));
   }
 
-  _parseContent() {
+  void _parseContent() {
     var workbook = _archive.findFile('xl/workbook.xml');
     workbook.decompress();
-    var document = parse(utf8.decode(workbook.content));
+    var document = XmlDocument.parse(utf8.decode(workbook.content));
     document.findAllElements('sheet').forEach((node) {
       _parseTable(node);
     });
   }
 
-  _parseTable(XmlElement node) {
+  void _parseTable(XmlElement node) {
     var name = node.getAttribute('name');
-    var target = _worksheetTargets[node.getAttribute('id', namespace: _relationships)];
+    var target =
+        _worksheetTargets[node.getAttribute('id', namespace: _relationships)];
     tables[name] = SpreadsheetTable(name);
     var table = tables[name];
 
-    var file = _archive.findFile("xl/$target");
+    var file = _archive.findFile('xl/$target');
     file.decompress();
 
-    var content = parse(utf8.decode(file.content));
+    var content = XmlDocument.parse(utf8.decode(file.content));
     var worksheet = content.findElements('worksheet').first;
     var sheet = worksheet.findElements('sheetData').first;
 
@@ -293,14 +316,14 @@ class XlsxDecoder extends SpreadsheetDecoder {
     });
     if (_update == true) {
       _sheets[name] = sheet;
-      _xmlFiles["xl/$target"] = content;
+      _xmlFiles['xl/$target'] = content;
     }
 
     _normalizeTable(table);
   }
 
-  _parseRow(XmlElement node, SpreadsheetTable table) {
-    var row = List();
+  void _parseRow(XmlElement node, SpreadsheetTable table) {
+    var row = [];
 
     _findCells(node).forEach((child) {
       _parseCell(child, table, row);
@@ -310,20 +333,20 @@ class XlsxDecoder extends SpreadsheetDecoder {
     if (_isNotEmptyRow(row) && rowIndex > table._rows.length) {
       var repeat = rowIndex - table._rows.length;
       for (var index = 0; index < repeat; index++) {
-        table._rows.add(List());
+        table._rows.add([]);
       }
     }
 
     if (_isNotEmptyRow(row)) {
       table._rows.add(row);
     } else {
-      table._rows.add(List());
+      table._rows.add([]);
     }
 
     _countFilledRow(table, row);
   }
 
-  _parseCell(XmlElement node, SpreadsheetTable table, List row) {
+  void _parseCell(XmlElement node, SpreadsheetTable table, List row) {
     var colIndex = _getCellNumber(node) - 1;
     if (colIndex > row.length) {
       var repeat = colIndex - row.length;
@@ -342,7 +365,8 @@ class XlsxDecoder extends SpreadsheetDecoder {
     switch (type) {
       // sharedString
       case 's':
-        value = _sharedStrings[int.parse(_parseValue(node.findElements('v').first))];
+        value = _sharedStrings[
+            int.parse(_parseValue(node.findElements('v').first))];
         break;
       // boolean
       case 'b':
@@ -377,13 +401,17 @@ class XlsxDecoder extends SpreadsheetDecoder {
           if (((fmtId >= 14) && (fmtId <= 17)) || (fmtId == 22)) {
             var delta = num.parse(_parseValue(content)) * 24 * 3600 * 1000;
             var date = DateTime(1899, 12, 30);
-            value = date.add(Duration(milliseconds: delta.toInt())).toIso8601String();
+            value = date
+                .add(Duration(milliseconds: delta.toInt()))
+                .toIso8601String();
             // time
-          } else if (((fmtId >= 18) && (fmtId <= 21)) || ((fmtId >= 45) && (fmtId <= 47))) {
+          } else if (((fmtId >= 18) && (fmtId <= 21)) ||
+              ((fmtId >= 45) && (fmtId <= 47))) {
             var delta = num.parse(_parseValue(content)) * 24 * 3600 * 1000;
             var date = DateTime(0);
             date = date.add(Duration(milliseconds: delta.toInt()));
-            value = "${_twoDigits(date.hour)}:${_twoDigits(date.minute)}:${_twoDigits(date.second)}";
+            value =
+                '${_twoDigits(date.hour)}:${_twoDigits(date.minute)}:${_twoDigits(date.second)}';
             // number
           } else {
             value = num.parse(_parseValue(content));
@@ -397,7 +425,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
     _countFilledColumn(table, row, value);
   }
 
-  _parseValue(XmlElement node) {
+  String _parseValue(XmlElement node) {
     var buffer = StringBuffer();
 
     node.children.forEach((child) {
@@ -409,12 +437,15 @@ class XlsxDecoder extends SpreadsheetDecoder {
     return buffer.toString();
   }
 
-  static Iterable<XmlElement> _findRows(XmlElement table) => table.findElements('row');
+  static Iterable<XmlElement> _findRows(XmlElement table) =>
+      table.findElements('row');
 
-  static Iterable<XmlElement> _findCells(XmlElement row) => row.findElements('c');
+  static Iterable<XmlElement> _findCells(XmlElement row) =>
+      row.findElements('c');
 
   static int _getRowNumber(XmlElement row) => int.parse(row.getAttribute('r'));
-  static void _setRowNumber(XmlElement row, int index) => row.getAttributeNode('r').value = index.toString();
+  static void _setRowNumber(XmlElement row, int index) =>
+      row.getAttributeNode('r').value = index.toString();
 
   static int _getCellNumber(XmlElement cell) {
     var coords = cellCoordsFromCellId(cell.getAttribute('r'));
@@ -454,7 +485,8 @@ class XlsxDecoder extends SpreadsheetDecoder {
     return row;
   }
 
-  static XmlElement _updateCell(XmlElement node, int columnIndex, int rowIndex, dynamic value) {
+  static XmlElement _updateCell(
+      XmlElement node, int columnIndex, int rowIndex, dynamic value) {
     XmlElement cell;
     var cells = _findCells(node);
 
@@ -483,7 +515,8 @@ class XlsxDecoder extends SpreadsheetDecoder {
     return XmlElement(XmlName('row'), attributes, []);
   }
 
-  static XmlElement _insertRow(XmlElement table, XmlElement lastRow, int rowIndex) {
+  static XmlElement _insertRow(
+      XmlElement table, XmlElement lastRow, int rowIndex) {
     var row = _createRow(rowIndex);
     if (lastRow == null) {
       table.children.add(row);
@@ -494,7 +527,8 @@ class XlsxDecoder extends SpreadsheetDecoder {
     return row;
   }
 
-  static XmlElement _insertCell(XmlElement row, XmlElement lastCell, int columnIndex, int rowIndex, dynamic value) {
+  static XmlElement _insertCell(XmlElement row, XmlElement lastCell,
+      int columnIndex, int rowIndex, dynamic value) {
     var cell = _createCell(columnIndex, rowIndex, value);
     if (lastCell == null) {
       row.children.add(cell);
@@ -505,7 +539,8 @@ class XlsxDecoder extends SpreadsheetDecoder {
     return cell;
   }
 
-  static XmlElement _replaceCell(XmlElement row, XmlElement lastCell, int columnIndex, int rowIndex, dynamic value) {
+  static XmlElement _replaceCell(XmlElement row, XmlElement lastCell,
+      int columnIndex, int rowIndex, dynamic value) {
     var index = lastCell == null ? 0 : row.children.indexOf(lastCell);
     var cell = _createCell(columnIndex, rowIndex, value);
     row.children
@@ -517,7 +552,8 @@ class XlsxDecoder extends SpreadsheetDecoder {
   // TODO Manage value's type
   static XmlElement _createCell(int columnIndex, int rowIndex, dynamic value) {
     var attributes = <XmlAttribute>[
-      XmlAttribute(XmlName('r'), '${numericToLetters(columnIndex + 1)}${rowIndex + 1}'),
+      XmlAttribute(
+          XmlName('r'), '${numericToLetters(columnIndex + 1)}${rowIndex + 1}'),
       XmlAttribute(XmlName('t'), 'inlineStr'),
     ];
     var children = value == null
