@@ -1,3 +1,6 @@
+## 1.1.1
+Update dependencies
+
 ## 1.1.0
 Fix insertion on empty sheet
 Fix unnecessary string escape

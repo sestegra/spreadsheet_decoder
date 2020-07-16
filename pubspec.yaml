@@ -1,6 +1,6 @@
 name: spreadsheet_decoder
 description: A lightweight library for parsing and updating spreadsheet documents
-version: 1.1.0
+version: 1.1.1
 authors:
 - Stéphane Este-Gracias <sestegra@gmail.com>
 homepage: https://github.com/sestegra/spreadsheet
