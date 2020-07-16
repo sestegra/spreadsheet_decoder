@@ -1,3 +1,6 @@
+## 1.2.0
+Add pedantic linter
+
 ## 1.1.1
 Update dependencies
 
