@@ -29,11 +29,11 @@ final Map<String, String> files = {
 };
 
 String readBase64(String filename) {
-  return files[filename];
+  return files[filename]!;
 }
 
 SpreadsheetDecoder decode(String filename, {bool update = false}) {
-  return SpreadsheetDecoder.decodeBytes(Base64Decoder().convert(files[filename]), update: update);
+  return SpreadsheetDecoder.decodeBytes(Base64Decoder().convert(readBase64(filename)), update: update);
 }
 
 void save(String file, List<int> data) {}

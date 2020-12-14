@@ -18,7 +18,7 @@ SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive, bool update) {
   var format;
 
   // Try OpenDocument format
-  var mimetype = archive.findFile('mimetype');
+  var mimetype = archive.findFile('mimetype') as ArchiveFile?;
   if (mimetype != null) {
     mimetype.decompress();
     var content = utf8.decode(mimetype.content);
@@ -28,7 +28,7 @@ SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive, bool update) {
 
     // Try OpenXml Office format
   } else {
-    var xl = archive.findFile('xl/workbook.xml');
+    var xl = archive.findFile('xl/workbook.xml') as ArchiveFile?;
     format = xl != null ? _spreasheetXlsx : null;
   }
 
@@ -51,13 +51,13 @@ const List<String> _noCompression = <String>[
 
 /// Decode a spreadsheet file.
 abstract class SpreadsheetDecoder {
-  bool _update;
-  Archive _archive;
-  Map<String, XmlNode> _sheets;
-  Map<String, XmlDocument> _xmlFiles;
-  Map<String, ArchiveFile> _archiveFiles;
+  late bool _update;
+  late Archive _archive;
+  late Map<String, XmlElement> _sheets;
+  late Map<String, XmlDocument> _xmlFiles;
+  late Map<String, ArchiveFile> _archiveFiles;
 
-  Map<String, SpreadsheetTable> _tables;
+  late Map<String, SpreadsheetTable> _tables;
 
   /// Media type
   String get mediaType;
@@ -83,7 +83,7 @@ abstract class SpreadsheetDecoder {
   }
 
   /// Dump XML content (for debug purpose)
-  String dumpXmlContent([String sheet]);
+  String dumpXmlContent([String? sheet]);
 
   void _checkSheetArguments(String sheet) {
     if (_update != true) {
@@ -97,11 +97,12 @@ abstract class SpreadsheetDecoder {
   /// Insert column in [sheet] at position [columnIndex]
   void insertColumn(String sheet, int columnIndex) {
     _checkSheetArguments(sheet);
-    if (columnIndex < 0 || columnIndex > _tables[sheet]._maxCols) {
-      throw RangeError.range(columnIndex, 0, _tables[sheet]._maxCols);
+    var table = _tables[sheet]!;
+
+    if (columnIndex < 0 || columnIndex > table._maxCols) {
+      throw RangeError.range(columnIndex, 0, table._maxCols);
     }
 
-    var table = _tables[sheet];
     table.rows.forEach((row) => row.insert(columnIndex, null));
     table._maxCols++;
   }
@@ -109,11 +110,12 @@ abstract class SpreadsheetDecoder {
   /// Remove column in [sheet] at position [columnIndex]
   void removeColumn(String sheet, int columnIndex) {
     _checkSheetArguments(sheet);
-    if (columnIndex < 0 || columnIndex >= _tables[sheet]._maxCols) {
-      throw RangeError.range(columnIndex, 0, _tables[sheet]._maxCols - 1);
+    var table = _tables[sheet]!;
+
+    if (columnIndex < 0 || columnIndex >= table._maxCols) {
+      throw RangeError.range(columnIndex, 0, table._maxCols - 1);
     }
 
-    var table = _tables[sheet];
     table.rows.forEach((row) => row.removeAt(columnIndex));
     table._maxCols--;
   }
@@ -121,11 +123,12 @@ abstract class SpreadsheetDecoder {
   /// Insert row in [sheet] at position [rowIndex]
   void insertRow(String sheet, int rowIndex) {
     _checkSheetArguments(sheet);
-    if (rowIndex < 0 || rowIndex > _tables[sheet]._maxRows) {
-      throw RangeError.range(rowIndex, 0, _tables[sheet]._maxRows);
+    var table = _tables[sheet]!;
+
+    if (rowIndex < 0 || rowIndex > table._maxRows) {
+      throw RangeError.range(rowIndex, 0, table._maxRows);
     }
 
-    var table = _tables[sheet];
     table.rows.insert(rowIndex, List.generate(table._maxCols, (_) => null));
     table._maxRows++;
   }
@@ -133,11 +136,12 @@ abstract class SpreadsheetDecoder {
   /// Remove row in [sheet] at position [rowIndex]
   void removeRow(String sheet, int rowIndex) {
     _checkSheetArguments(sheet);
-    if (rowIndex < 0 || rowIndex >= _tables[sheet]._maxRows) {
-      throw RangeError.range(rowIndex, 0, _tables[sheet]._maxRows - 1);
+    var table = _tables[sheet]!;
+
+    if (rowIndex < 0 || rowIndex >= table._maxRows) {
+      throw RangeError.range(rowIndex, 0, table._maxRows - 1);
     }
 
-    var table = _tables[sheet];
     table.rows.removeAt(rowIndex);
     table._maxRows--;
   }
@@ -145,14 +149,16 @@ abstract class SpreadsheetDecoder {
   /// Update the contents from [sheet] of the cell [columnIndex]x[rowIndex] with indexes start from 0
   void updateCell(String sheet, int columnIndex, int rowIndex, dynamic value) {
     _checkSheetArguments(sheet);
-    if (columnIndex < 0 || columnIndex >= _tables[sheet]._maxCols) {
-      throw RangeError.range(columnIndex, 0, _tables[sheet]._maxCols - 1);
+    var table = _tables[sheet]!;
+
+    if (columnIndex < 0 || columnIndex >= table._maxCols) {
+      throw RangeError.range(columnIndex, 0, table._maxCols - 1);
     }
-    if (rowIndex < 0 || rowIndex >= _tables[sheet]._maxRows) {
-      throw RangeError.range(rowIndex, 0, _tables[sheet]._maxRows - 1);
+    if (rowIndex < 0 || rowIndex >= table._maxRows) {
+      throw RangeError.range(rowIndex, 0, table._maxRows - 1);
     }
 
-    _tables[sheet].rows[rowIndex][columnIndex] = value.toString();
+    table.rows[rowIndex][columnIndex] = value.toString();
   }
 
   /// Encode bytes after update
@@ -183,7 +189,7 @@ abstract class SpreadsheetDecoder {
       if (file.isFile) {
         ArchiveFile copy;
         if (_archiveFiles.containsKey(file.name)) {
-          copy = _archiveFiles[file.name];
+          copy = _archiveFiles[file.name]!;
         } else {
           var content = (file.content as Uint8List).toList();
           //var compress = file.compress;
