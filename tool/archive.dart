@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:typed_data';
-// ignore: import_of_legacy_library_into_null_safe
 import 'package:archive/archive.dart';
 import 'package:path/path.dart';
 
