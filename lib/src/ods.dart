@@ -96,8 +96,8 @@ class OdsDecoder extends SpreadsheetDecoder {
 
   void _parseContent() {
     var file = _archive.findFile(CONTENT_XML);
-    file.decompress();
-    var content = XmlDocument.parse(utf8.decode(file.content));
+    file?.decompress();
+    var content = XmlDocument.parse(utf8.decode(file?.content));
     if (_update == true) {
       _archiveFiles = <String, ArchiveFile>{};
       _sheets = <String, XmlElement>{};
@@ -237,9 +237,7 @@ class OdsDecoder extends SpreadsheetDecoder {
 
   static int _getRowRepeated(XmlElement row) {
     var attr = row.getAttribute('table:number-rows-repeated');
-    return (attr != null)
-        ? int.parse(attr)
-        : 1;
+    return (attr != null) ? int.parse(attr) : 1;
   }
 
   static int _removeRowRepeated(XmlElement row) {
@@ -250,9 +248,7 @@ class OdsDecoder extends SpreadsheetDecoder {
 
   static int _getCellRepeated(XmlElement cell) {
     var attr = cell.getAttribute('table:number-columns-repeated');
-    return (attr != null)
-        ? int.parse(attr)
-        : 1;
+    return (attr != null) ? int.parse(attr) : 1;
   }
 
   static int _removeCellRepeated(XmlElement cell) {
