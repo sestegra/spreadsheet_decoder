@@ -258,9 +258,9 @@ void testXlsx() {
     test('Empty file', () {
       var decoder = decode('default.xlsx');
       expect(decoder.tables.length, 3);
-      expect(decoder.tables['Sheet1'].rows, []);
-      expect(decoder.tables['Sheet2'].rows, []);
-      expect(decoder.tables['Sheet3'].rows, []);
+      expect(decoder.tables['Sheet1']!.rows, []);
+      expect(decoder.tables['Sheet2']!.rows, []);
+      expect(decoder.tables['Sheet3']!.rows, []);
     });
 
     test('Test file', () {
@@ -315,7 +315,7 @@ void testOds() {
     test('Empty file', () {
       var decoder = decode('default.ods');
       expect(decoder.tables.length, 1);
-      expect(decoder.tables['Sheet1'].rows, []);
+      expect(decoder.tables['Sheet1']!.rows, []);
     });
 
     test('Test file', () {
@@ -362,9 +362,9 @@ void testUpdateXlsx() {
 
         var decoder = SpreadsheetDecoder.decodeBytes(data);
         expect(decoder.tables.length, 3);
-        expect(decoder.tables['Sheet1'].rows, []);
-        expect(decoder.tables['Sheet2'].rows, []);
-        expect(decoder.tables['Sheet3'].rows, []);
+        expect(decoder.tables['Sheet1']!.rows, []);
+        expect(decoder.tables['Sheet2']!.rows, []);
+        expect(decoder.tables['Sheet3']!.rows, []);
       });
 
       test('Test file', () {
@@ -506,7 +506,7 @@ void testUpdateXlsx() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].insert(0, [null, null, null]);
+          expectedTables['ONE']!.insert(0, [null, null, null]);
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -523,7 +523,7 @@ void testUpdateXlsx() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].add(['insert', null, null]);
+          expectedTables['ONE']!.add(['insert', null, null]);
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -538,7 +538,7 @@ void testUpdateXlsx() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].insert(10, [null, null, null]);
+          expectedTables['ONE']!.insert(10, [null, null, null]);
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -556,7 +556,7 @@ void testUpdateXlsx() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['EMPTY'].insert(0, ['42']);
+          expectedTables['EMPTY']!.insert(0, ['42']);
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -589,7 +589,7 @@ void testUpdateXlsx() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].removeAt(0);
+          expectedTables['ONE']!.removeAt(0);
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -604,7 +604,7 @@ void testUpdateXlsx() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].removeAt(11);
+          expectedTables['ONE']!.removeAt(11);
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -619,7 +619,7 @@ void testUpdateXlsx() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].removeAt(10);
+          expectedTables['ONE']!.removeAt(10);
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -654,7 +654,7 @@ void testUpdateXlsx() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].forEach((row) {
+          expectedTables['ONE']!.forEach((row) {
             row.insert(0, null);
           });
 
@@ -673,10 +673,10 @@ void testUpdateXlsx() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].forEach((row) {
+          expectedTables['ONE']!.forEach((row) {
             row.add(null);
           });
-          expectedTables['ONE'][0][3] = 'insert';
+          expectedTables['ONE']![0][3] = 'insert';
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -691,7 +691,7 @@ void testUpdateXlsx() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].forEach((row) {
+          expectedTables['ONE']!.forEach((row) {
             row.insert(1, null);
           });
 
@@ -728,7 +728,7 @@ void testUpdateXlsx() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].forEach((row) {
+          expectedTables['ONE']!.forEach((row) {
             row.removeAt(0);
           });
 
@@ -745,7 +745,7 @@ void testUpdateXlsx() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].forEach((row) {
+          expectedTables['ONE']!.forEach((row) {
             row.removeAt(2);
           });
 
@@ -762,7 +762,7 @@ void testUpdateXlsx() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].forEach((row) {
+          expectedTables['ONE']!.forEach((row) {
             row.removeAt(1);
           });
 
@@ -804,7 +804,7 @@ void testUpdateOds() {
 
         var decoder = SpreadsheetDecoder.decodeBytes(data);
         expect(decoder.tables.length, 1);
-        expect(decoder.tables['Sheet1'].rows, []);
+        expect(decoder.tables['Sheet1']!.rows, []);
       });
 
       test('Test file', () {
@@ -946,7 +946,7 @@ void testUpdateOds() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].insert(0, [null, null, null]);
+          expectedTables['ONE']!.insert(0, [null, null, null]);
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -963,7 +963,7 @@ void testUpdateOds() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].add(['insert', null, null]);
+          expectedTables['ONE']!.add(['insert', null, null]);
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -978,7 +978,7 @@ void testUpdateOds() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].insert(10, [null, null, null]);
+          expectedTables['ONE']!.insert(10, [null, null, null]);
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -1011,7 +1011,7 @@ void testUpdateOds() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].removeAt(0);
+          expectedTables['ONE']!.removeAt(0);
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -1026,7 +1026,7 @@ void testUpdateOds() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].removeAt(11);
+          expectedTables['ONE']!.removeAt(11);
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -1041,7 +1041,7 @@ void testUpdateOds() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].removeAt(10);
+          expectedTables['ONE']!.removeAt(10);
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -1076,7 +1076,7 @@ void testUpdateOds() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].forEach((row) {
+          expectedTables['ONE']!.forEach((row) {
             row.insert(0, null);
           });
 
@@ -1095,10 +1095,10 @@ void testUpdateOds() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].forEach((row) {
+          expectedTables['ONE']!.forEach((row) {
             row.add(null);
           });
-          expectedTables['ONE'][0][3] = 'insert';
+          expectedTables['ONE']![0][3] = 'insert';
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -1113,7 +1113,7 @@ void testUpdateOds() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].forEach((row) {
+          expectedTables['ONE']!.forEach((row) {
             row.insert(1, null);
           });
 
@@ -1150,7 +1150,7 @@ void testUpdateOds() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].forEach((row) {
+          expectedTables['ONE']!.forEach((row) {
             row.removeAt(0);
           });
 
@@ -1167,7 +1167,7 @@ void testUpdateOds() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].forEach((row) {
+          expectedTables['ONE']!.forEach((row) {
             row.removeAt(2);
           });
 
@@ -1184,7 +1184,7 @@ void testUpdateOds() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE'].forEach((row) {
+          expectedTables['ONE']!.forEach((row) {
             row.removeAt(1);
           });
 

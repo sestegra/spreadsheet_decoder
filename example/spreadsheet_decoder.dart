@@ -8,9 +8,9 @@ void main(List<String> args) {
   var decoder = SpreadsheetDecoder.decodeBytes(bytes, update: true);
   for (var table in decoder.tables.keys) {
     print(table);
-    print(decoder.tables[table].maxCols);
-    print(decoder.tables[table].maxRows);
-    for (var row in decoder.tables[table].rows) {
+    print(decoder.tables[table]!.maxCols);
+    print(decoder.tables[table]!.maxRows);
+    for (var row in decoder.tables[table]!.rows) {
       print('$row');
     }
   }
@@ -36,9 +36,9 @@ void main(List<String> args) {
   print('************************************************************');
   for (var table in decoder.tables.keys) {
     print(table);
-    print(decoder.tables[table].maxCols);
-    print(decoder.tables[table].maxRows);
-    for (var row in decoder.tables[table].rows) {
+    print(decoder.tables[table]!.maxCols);
+    print(decoder.tables[table]!.maxRows);
+    for (var row in decoder.tables[table]!.rows) {
       print('$row');
     }
   }
