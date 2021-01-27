@@ -190,7 +190,10 @@ class XlsxDecoder extends SpreadsheetDecoder {
     if (rowIndex < _tables[sheet]!._maxRows - 1) {
       var foundRow = _findRowByIndex(_sheets[sheet]!, rowIndex);
       _insertRow(parent, foundRow, rowIndex);
-      parent.children.whereType<XmlElement>().skipWhile((row) => row != foundRow).forEach((row) {
+      parent.children
+          .whereType<XmlElement>()
+          .skipWhile((row) => row != foundRow)
+          .forEach((row) {
         var rIndex = _getRowNumber(row) + 1;
         _setRowNumber(row, rIndex);
         _findCells(row).forEach((cell) {
@@ -208,7 +211,10 @@ class XlsxDecoder extends SpreadsheetDecoder {
 
     var parent = _sheets[sheet]!;
     var foundRow = _findRowByIndex(parent, rowIndex);
-    parent.children.whereType<XmlElement>().skipWhile((row) => row != foundRow).forEach((row) {
+    parent.children
+        .whereType<XmlElement>()
+        .skipWhile((row) => row != foundRow)
+        .forEach((row) {
       var rIndex = _getRowNumber(row) - 1;
       _setRowNumber(row, rIndex);
       _findCells(row).forEach((cell) {
@@ -227,7 +233,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
   }
 
   void _parseRelations() {
-    var relations = _archive.findFile('xl/_rels/workbook.xml.rels') as ArchiveFile?;
+    var relations = _archive.findFile('xl/_rels/workbook.xml.rels');
     if (relations != null) {
       relations.decompress();
       var document = XmlDocument.parse(utf8.decode(relations.content));
@@ -249,7 +255,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
   }
 
   void _parseStyles() {
-    var styles = _archive.findFile('xl/$_stylesTarget') as ArchiveFile?;
+    var styles = _archive.findFile('xl/$_stylesTarget');
     if (styles != null) {
       styles.decompress();
       var document = XmlDocument.parse(utf8.decode(styles.content));
@@ -269,7 +275,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
   }
 
   void _parseSharedStrings() {
-    var sharedStrings = _archive.findFile('xl/$_sharedStringsTarget') as ArchiveFile?;
+    var sharedStrings = _archive.findFile('xl/$_sharedStringsTarget');
     if (sharedStrings != null) {
       sharedStrings.decompress();
       var document = XmlDocument.parse(utf8.decode(sharedStrings.content));
@@ -289,8 +295,8 @@ class XlsxDecoder extends SpreadsheetDecoder {
 
   void _parseContent() {
     var workbook = _archive.findFile('xl/workbook.xml');
-    workbook.decompress();
-    var document = XmlDocument.parse(utf8.decode(workbook.content));
+    workbook?.decompress();
+    var document = XmlDocument.parse(utf8.decode(workbook?.content));
     document.findAllElements('sheet').forEach((node) {
       _parseTable(node);
     });
@@ -303,9 +309,9 @@ class XlsxDecoder extends SpreadsheetDecoder {
     var table = tables[name] = SpreadsheetTable(name);
 
     var file = _archive.findFile('xl/$target');
-    file.decompress();
+    file?.decompress();
 
-    var content = XmlDocument.parse(utf8.decode(file.content));
+    var content = XmlDocument.parse(utf8.decode(file?.content));
     var worksheet = content.findElements('worksheet').first;
     var sheet = worksheet.findElements('sheetData').first;
 

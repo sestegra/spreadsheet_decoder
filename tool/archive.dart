@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:typed_data';
-// ignore: import_of_legacy_library_into_null_safe
 import 'package:archive/archive.dart';
 import 'package:path/path.dart';
 
@@ -38,7 +37,7 @@ void main(List<String> args) {
       print(input);
       var archive =
           ZipDecoder().decodeBytes(File(input).readAsBytesSync(), verify: true);
-      var zip = ZipEncoder().encode(cloneArchive(archive));
+      var zip = ZipEncoder().encode(cloneArchive(archive)) as List<int>;
       try {
         archive = ZipDecoder().decodeBytes(zip, verify: true);
         var file = File('test/out/example/${basename(input)}')

@@ -18,7 +18,7 @@ SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive, bool update) {
   var format;
 
   // Try OpenDocument format
-  var mimetype = archive.findFile('mimetype') as ArchiveFile?;
+  var mimetype = archive.findFile('mimetype');
   if (mimetype != null) {
     mimetype.decompress();
     var content = utf8.decode(mimetype.content);
@@ -28,7 +28,7 @@ SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive, bool update) {
 
     // Try OpenXml Office format
   } else {
-    var xl = archive.findFile('xl/workbook.xml') as ArchiveFile?;
+    var xl = archive.findFile('xl/workbook.xml');
     format = xl != null ? _spreasheetXlsx : null;
   }
 
@@ -172,7 +172,7 @@ abstract class SpreadsheetDecoder {
       var content = utf8.encode(xml);
       _archiveFiles[xmlFile] = ArchiveFile(xmlFile, content.length, content);
     }
-    return ZipEncoder().encode(_cloneArchive(_archive));
+    return ZipEncoder().encode(_cloneArchive(_archive)) as List<int>;
   }
 
   /// Encode data url
