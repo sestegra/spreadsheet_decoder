@@ -1,3 +1,6 @@
+## 2.0.1
+Fix for absolute path target
+
 ## 2.0.0
 Release NNBD
 
