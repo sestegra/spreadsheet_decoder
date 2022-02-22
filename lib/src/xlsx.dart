@@ -305,10 +305,12 @@ class XlsxDecoder extends SpreadsheetDecoder {
   void _parseTable(XmlElement node) {
     var name = node.getAttribute('name')!;
     var target =
-        _worksheetTargets[node.getAttribute('id', namespace: _relationships)];
+        _worksheetTargets[node.getAttribute('id', namespace: _relationships)]!;
     var table = tables[name] = SpreadsheetTable(name);
 
-    var file = _archive.findFile('xl/$target');
+    final namePath =
+        target.startsWith('/') ? target.substring(1) : 'xl/$target';
+    var file = _archive.findFile(namePath);
     file?.decompress();
 
     var content = XmlDocument.parse(utf8.decode(file?.content));
@@ -320,7 +322,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
     });
     if (_update == true) {
       _sheets[name] = sheet;
-      _xmlFiles['xl/$target'] = content;
+      _xmlFiles[namePath] = content;
     }
 
     _normalizeTable(table);

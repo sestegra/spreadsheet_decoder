@@ -302,6 +302,11 @@ void testXlsx() {
         expect(table.rows, expectNumbers[name]);
       });
     });
+
+    test('Check `Target` format with absolute path', () {
+      var decoder = decode('absolute_target.xlsx');
+      expect(decoder is XlsxDecoder, isTrue);
+    });
   });
 }
 
