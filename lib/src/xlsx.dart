@@ -70,9 +70,9 @@ int _letterOnly(int rune) {
 
 String _twoDigits(int n) {
   if (n >= 10) {
-    return '${n}';
+    return '$n';
   }
-  return '0${n}';
+  return '0$n';
 }
 
 /// Returns the coordinates from a cell name.
@@ -467,7 +467,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
   static void _setCellRowNumber(XmlElement cell, int rowIndex) {
     var attr = cell.getAttributeNode('r')!;
     var coords = cellCoordsFromCellId(attr.value);
-    attr.value = '${numericToLetters(coords[0])}${rowIndex}';
+    attr.value = '${numericToLetters(coords[0])}$rowIndex';
   }
 
   static XmlElement _findRowByIndex(XmlElement table, int rowIndex) {

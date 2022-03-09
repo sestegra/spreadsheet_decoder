@@ -7,7 +7,7 @@ Archive cloneArchive(Archive archive) {
   var clone = Archive();
   archive.files.forEach((file) {
     if (file.isFile) {
-      var content = (file.content as Uint8List).toList();
+      var content = file.content as Uint8List;
       var copy = ArchiveFile(file.name, content.length, content)
         ..compress = file.compress;
       clone.addFile(copy);

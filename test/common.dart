@@ -306,6 +306,8 @@ void testXlsx() {
     test('Check `Target` format with absolute path', () {
       var decoder = decode('absolute_target.xlsx');
       expect(decoder is XlsxDecoder, isTrue);
+    }, onPlatform: {
+      'browser': Skip('Not supported in browser'),
     });
   });
 }

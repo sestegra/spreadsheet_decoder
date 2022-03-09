@@ -42,13 +42,6 @@ SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive, bool update) {
   }
 }
 
-// Issue on archive
-// https://github.com/brendan-duncan/archive/pull/43
-const List<String> _noCompression = <String>[
-  'mimetype',
-  'Thumbnails/thumbnail.png',
-];
-
 /// Decode a spreadsheet file.
 abstract class SpreadsheetDecoder {
   late bool _update;
@@ -178,7 +171,7 @@ abstract class SpreadsheetDecoder {
   /// Encode data url
   String dataUrl() {
     var buffer = StringBuffer();
-    buffer.write('data:${mediaType};base64,');
+    buffer.write('data:$mediaType;base64,');
     buffer.write(base64Encode(encode()));
     return buffer.toString();
   }
@@ -191,9 +184,8 @@ abstract class SpreadsheetDecoder {
         if (_archiveFiles.containsKey(file.name)) {
           copy = _archiveFiles[file.name]!;
         } else {
-          var content = (file.content as Uint8List).toList();
-          //var compress = file.compress;
-          var compress = _noCompression.contains(file.name) ? false : true;
+          var content = file.content as Uint8List;
+          var compress = file.compress;
           copy = ArchiveFile(file.name, content.length, content)
             ..compress = compress;
         }
