@@ -1,3 +1,6 @@
+## 2.0.2
+Fix breaking changes from archive 3.2.0
+
 ## 2.0.1
 Fix for absolute path target
 
