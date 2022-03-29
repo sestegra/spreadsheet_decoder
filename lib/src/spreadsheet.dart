@@ -69,7 +69,7 @@ abstract class SpreadsheetDecoder {
     return _newSpreadsheetDecoder(archive, update);
   }
 
-  factory SpreadsheetDecoder.decodeBuffer(InputStream input,
+  factory SpreadsheetDecoder.decodeBuffer(InputStreamBase input,
       {bool update = false, bool verify = false}) {
     var archive = ZipDecoder().decodeBuffer(input, verify: verify);
     return _newSpreadsheetDecoder(archive, update);
