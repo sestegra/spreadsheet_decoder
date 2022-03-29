@@ -1,3 +1,6 @@
+## 2.1.0
+Update dependencies
+
 ## 2.0.2
 Fix breaking changes from archive 3.2.0
 
