@@ -125,7 +125,7 @@ Map<String, List<List>> copyTables(Map<String, List<List>> tables) {
 
 void testUnsupported() {
   test('Unsupported file', () {
-    var decoder;
+    SpreadsheetDecoder? decoder;
     try {
       decoder = decode('unsupported.zip');
     } catch (e) {
@@ -661,9 +661,9 @@ void testUpdateXlsx() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE']!.forEach((row) {
+          for (var row in expectedTables['ONE']!) {
             row.insert(0, null);
-          });
+          }
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -680,9 +680,9 @@ void testUpdateXlsx() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE']!.forEach((row) {
+          for (var row in expectedTables['ONE']!) {
             row.add(null);
-          });
+          }
           expectedTables['ONE']![0][3] = 'insert';
 
           expect(decoder.tables.length, expectedTables.keys.length);
@@ -698,9 +698,9 @@ void testUpdateXlsx() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE']!.forEach((row) {
+          for (var row in expectedTables['ONE']!) {
             row.insert(1, null);
-          });
+          }
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -735,9 +735,9 @@ void testUpdateXlsx() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE']!.forEach((row) {
+          for (var row in expectedTables['ONE']!) {
             row.removeAt(0);
-          });
+          }
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -752,9 +752,9 @@ void testUpdateXlsx() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE']!.forEach((row) {
+          for (var row in expectedTables['ONE']!) {
             row.removeAt(2);
-          });
+          }
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -769,9 +769,9 @@ void testUpdateXlsx() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE']!.forEach((row) {
+          for (var row in expectedTables['ONE']!) {
             row.removeAt(1);
-          });
+          }
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -1083,9 +1083,9 @@ void testUpdateOds() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE']!.forEach((row) {
+          for (var row in expectedTables['ONE']!) {
             row.insert(0, null);
-          });
+          }
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -1102,9 +1102,9 @@ void testUpdateOds() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE']!.forEach((row) {
+          for (var row in expectedTables['ONE']!) {
             row.add(null);
-          });
+          }
           expectedTables['ONE']![0][3] = 'insert';
 
           expect(decoder.tables.length, expectedTables.keys.length);
@@ -1120,9 +1120,9 @@ void testUpdateOds() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE']!.forEach((row) {
+          for (var row in expectedTables['ONE']!) {
             row.insert(1, null);
-          });
+          }
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -1157,9 +1157,9 @@ void testUpdateOds() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE']!.forEach((row) {
+          for (var row in expectedTables['ONE']!) {
             row.removeAt(0);
-          });
+          }
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -1174,9 +1174,9 @@ void testUpdateOds() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE']!.forEach((row) {
+          for (var row in expectedTables['ONE']!) {
             row.removeAt(2);
-          });
+          }
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {
@@ -1191,9 +1191,9 @@ void testUpdateOds() {
 
           var decoder = SpreadsheetDecoder.decodeBytes(data);
           var expectedTables = copyTables(expectedTest);
-          expectedTables['ONE']!.forEach((row) {
+          for (var row in expectedTables['ONE']!) {
             row.removeAt(1);
-          });
+          }
 
           expect(decoder.tables.length, expectedTables.keys.length);
           decoder.tables.forEach((name, table) {

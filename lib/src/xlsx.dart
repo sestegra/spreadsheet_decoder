@@ -365,7 +365,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
       return;
     }
 
-    var value;
+    dynamic value;
     var type = node.getAttribute('t');
 
     switch (type) {
@@ -434,11 +434,11 @@ class XlsxDecoder extends SpreadsheetDecoder {
   String _parseValue(XmlElement node) {
     var buffer = StringBuffer();
 
-    node.children.forEach((child) {
+    for (var child in node.children) {
       if (child is XmlText) {
         buffer.write(_normalizeNewLine(child.text));
       }
-    });
+    }
 
     return buffer.toString();
   }

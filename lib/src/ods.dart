@@ -9,7 +9,7 @@
 //   - hidden columns (visible in resulting table)
 part of spreadsheet_decoder;
 
-const String CONTENT_XML = 'content.xml';
+const String contentXML = 'content.xml';
 
 /// Read and parse ODS spreadsheet
 class OdsDecoder extends SpreadsheetDecoder {
@@ -29,7 +29,7 @@ class OdsDecoder extends SpreadsheetDecoder {
   @override
   String dumpXmlContent([String? sheet]) {
     if (sheet == null) {
-      return _xmlFiles[CONTENT_XML]!.toXmlString(pretty: true);
+      return _xmlFiles[contentXML]!.toXmlString(pretty: true);
     } else {
       return _sheets[sheet]!.toXmlString(pretty: true);
     }
@@ -95,14 +95,14 @@ class OdsDecoder extends SpreadsheetDecoder {
   }
 
   void _parseContent() {
-    var file = _archive.findFile(CONTENT_XML);
+    var file = _archive.findFile(contentXML);
     file?.decompress();
     var content = XmlDocument.parse(utf8.decode(file?.content));
     if (_update == true) {
       _archiveFiles = <String, ArchiveFile>{};
       _sheets = <String, XmlElement>{};
       _xmlFiles = {
-        CONTENT_XML: content,
+        contentXML: content,
       };
       _parseStyles(content);
     }
@@ -183,7 +183,7 @@ class OdsDecoder extends SpreadsheetDecoder {
   }
 
   dynamic _readCell(XmlElement node) {
-    var value;
+    dynamic value;
     var type = node.getAttribute('office:value-type');
     switch (type) {
       case 'float':
@@ -218,13 +218,13 @@ class OdsDecoder extends SpreadsheetDecoder {
   String _readString(XmlElement node) {
     var buffer = StringBuffer();
 
-    node.children.forEach((child) {
+    for (var child in node.children) {
       if (child is XmlElement) {
         buffer.write(_normalizeNewLine(_readString(child)));
       } else if (child is XmlText) {
         buffer.write(_normalizeNewLine(child.text));
       }
-    });
+    }
 
     return buffer.toString();
   }

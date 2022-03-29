@@ -15,7 +15,7 @@ String _normalizeNewLine(String text) {
 
 SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive, bool update) {
   // Lookup at file format
-  var format;
+  String? format;
 
   // Try OpenDocument format
   var mimetype = archive.findFile('mimetype');
@@ -96,7 +96,9 @@ abstract class SpreadsheetDecoder {
       throw RangeError.range(columnIndex, 0, table._maxCols);
     }
 
-    table.rows.forEach((row) => row.insert(columnIndex, null));
+    for (var row in table.rows) {
+      row.insert(columnIndex, null);
+    }
     table._maxCols++;
   }
 
@@ -109,7 +111,9 @@ abstract class SpreadsheetDecoder {
       throw RangeError.range(columnIndex, 0, table._maxCols - 1);
     }
 
-    table.rows.forEach((row) => row.removeAt(columnIndex));
+    for (var row in table.rows) {
+      row.removeAt(columnIndex);
+    }
     table._maxCols--;
   }
 
@@ -178,7 +182,7 @@ abstract class SpreadsheetDecoder {
 
   Archive _cloneArchive(Archive archive) {
     var clone = Archive();
-    archive.files.forEach((file) {
+    for (var file in archive.files) {
       if (file.isFile) {
         ArchiveFile copy;
         if (_archiveFiles.containsKey(file.name)) {
@@ -191,7 +195,7 @@ abstract class SpreadsheetDecoder {
         }
         clone.addFile(copy);
       }
-    });
+    }
     return clone;
   }
 

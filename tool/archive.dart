@@ -5,14 +5,14 @@ import 'package:path/path.dart';
 
 Archive cloneArchive(Archive archive) {
   var clone = Archive();
-  archive.files.forEach((file) {
+  for (var file in archive.files) {
     if (file.isFile) {
       var content = file.content as Uint8List;
       var copy = ArchiveFile(file.name, content.length, content)
         ..compress = file.compress;
       clone.addFile(copy);
     }
-  });
+  }
   return clone;
 }
 
