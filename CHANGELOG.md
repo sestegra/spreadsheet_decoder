@@ -1,3 +1,6 @@
+## 2.1.1
+Fix conflicting archive dependency for using integration_test package
+
 ## 2.1.0
 Update dependencies
 
