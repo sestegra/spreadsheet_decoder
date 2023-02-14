@@ -1,3 +1,7 @@
+## 2.2.0
+Exclude phonetic information from cell value
+Thanks to @okaxaki
+
 ## 2.1.1
 Fix conflicting archive dependency for using integration_test package
 
