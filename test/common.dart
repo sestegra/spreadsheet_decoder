@@ -115,6 +115,18 @@ var expectNumbers = <String, List<List>>{
   ]
 };
 
+var expectedNoPhonetics = <String, List<List>>{
+  'Sheet1': [
+    [
+      '漢字',
+      '日本語と漢字',
+      '文字装飾を含む文章',
+      'Text without Phonetic',
+      'Text with Style, without Phonetic'
+    ]
+  ]
+};
+
 Map<String, List<List>> copyTables(Map<String, List<List>> tables) {
   var copy = <String, List<List>>{};
   tables.forEach((sheet, table) {
@@ -308,6 +320,14 @@ void testXlsx() {
       expect(decoder is XlsxDecoder, isTrue);
     }, onPlatform: {
       'browser': Skip('Not supported in browser'),
+    });
+
+    test('Exclude phonetics', () {
+      var decoder = decode('phonetic.xlsx');
+      expect(decoder.tables.length, expectedNoPhonetics.keys.length);
+      decoder.tables.forEach((name, table) {
+        expect(table.rows, expectedNoPhonetics[name]);
+      });      
     });
   });
 }
