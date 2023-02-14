@@ -285,10 +285,20 @@ class XlsxDecoder extends SpreadsheetDecoder {
     }
   }
 
+  String _parseRichText(XmlElement node) {
+    return _parseValue(node.findElements('t').first);
+  }
+
   void _parseSharedString(XmlElement node) {
     var list = [];
-    node.findAllElements('t').forEach((child) {
-      list.add(_parseValue(child));
+    node.childElements.forEach((node) {
+      if (node.localName == 't') {
+        list.add(_parseValue(node));
+      } else if (node.localName == 'r') {
+        list.add(_parseRichText(node));
+      } else {
+        // ignores <rPh> and <phoneticPr>
+      }
     });
     _sharedStrings.add(list.join(''));
   }
