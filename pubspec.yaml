@@ -1,16 +1,16 @@
 name: spreadsheet_decoder
 description: A lightweight library for parsing and updating spreadsheet documents
-version: 2.1.1
+version: 2.2.0
 homepage: https://github.com/sestegra/spreadsheet
 
 environment:
   sdk: ">=2.16.2 <3.0.0"
 
 dependencies:
-  archive: ^3.1.11
-  xml: ^6.0.1
+  archive: ^3.3.6
+  xml: ^6.2.2
 
 dev_dependencies:
-  path: ^1.8.1
-  lints: ^1.0.1
-  test: ^1.20.2
+  path: ^1.8.3
+  lints: ^2.0.1
+  test: ^1.23.1
