@@ -1,3 +1,6 @@
+## 2.3.0
+Update dependencies
+
 ## 2.2.0
 Exclude phonetic information from cell value
 Thanks to @okaxaki
