@@ -9,6 +9,16 @@ const String _relationshipsWorksheet =
 const String _relationshipsSharedStrings =
     'http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings';
 
+extension XlsxXmlFindExtension on XmlNode {
+  Iterable<XmlElement> findElementsStar(String name,
+          {String namespace = "*"}) =>
+      findElements(name, namespace: namespace);
+
+  Iterable<XmlElement> findAllElementsStar(String name,
+          {String namespace = "*"}) =>
+      findAllElements(name, namespace: namespace);
+}
+
 /// Convert a character based column
 int lettersToNumeric(String letters) {
   var sum = 0;
@@ -237,7 +247,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
     if (relations != null) {
       relations.decompress();
       var document = XmlDocument.parse(utf8.decode(relations.content));
-      document.findAllElements('Relationship').forEach((node) {
+      document.findAllElementsStar('Relationship').forEach((node) {
         var attr = node.getAttribute('Target');
         switch (node.getAttribute('Type')) {
           case _relationshipsStyles:
@@ -255,38 +265,48 @@ class XlsxDecoder extends SpreadsheetDecoder {
   }
 
   void _parseStyles() {
-    var styles = _archive.findFile('xl/$_stylesTarget');
-    if (styles != null) {
-      styles.decompress();
-      var document = XmlDocument.parse(utf8.decode(styles.content));
-      document
-          .findAllElements('cellXfs')
-          .first
-          .findElements('xf')
-          .forEach((node) {
-        var numFmtId = node.getAttribute('numFmtId');
-        if (numFmtId != null) {
-          _numFormats.add(int.parse(numFmtId));
-        } else {
-          _numFormats.add(0);
-        }
-      });
+    if (_stylesTarget is String) {
+      final namePath = _stylesTarget!.startsWith('/')
+          ? _stylesTarget!.substring(1)
+          : 'xl/$_stylesTarget';
+      var styles = _archive.findFile(namePath);
+      if (styles != null) {
+        styles.decompress();
+        var document = XmlDocument.parse(utf8.decode(styles.content));
+        document
+            .findAllElementsStar('cellXfs')
+            .first
+            .findElementsStar('xf')
+            .forEach((node) {
+          var numFmtId = node.getAttribute('numFmtId');
+          if (numFmtId != null) {
+            _numFormats.add(int.parse(numFmtId));
+          } else {
+            _numFormats.add(0);
+          }
+        });
+      }
     }
   }
 
   void _parseSharedStrings() {
-    var sharedStrings = _archive.findFile('xl/$_sharedStringsTarget');
-    if (sharedStrings != null) {
-      sharedStrings.decompress();
-      var document = XmlDocument.parse(utf8.decode(sharedStrings.content));
-      document.findAllElements('si').forEach((node) {
-        _parseSharedString(node);
-      });
+    if (_sharedStringsTarget is String) {
+      final namePath = _sharedStringsTarget!.startsWith('/')
+          ? _sharedStringsTarget!.substring(1)
+          : 'xl/$_sharedStringsTarget';
+      var sharedStrings = _archive.findFile(namePath);
+      if (sharedStrings != null) {
+        sharedStrings.decompress();
+        var document = XmlDocument.parse(utf8.decode(sharedStrings.content));
+        document.findAllElementsStar('si').forEach((node) {
+          _parseSharedString(node);
+        });
+      }
     }
   }
 
   String _parseRichText(XmlElement node) {
-    return _parseValue(node.findElements('t').first);
+    return _parseValue(node.findElementsStar('t').first);
   }
 
   void _parseSharedString(XmlElement node) {
@@ -307,13 +327,14 @@ class XlsxDecoder extends SpreadsheetDecoder {
     var workbook = _archive.findFile('xl/workbook.xml');
     workbook?.decompress();
     var document = XmlDocument.parse(utf8.decode(workbook?.content));
-    document.findAllElements('sheet').forEach((node) {
+    document.findAllElementsStar('sheet').forEach((node) {
       _parseTable(node);
     });
   }
 
   void _parseTable(XmlElement node) {
     var name = node.getAttribute('name')!;
+
     var target =
         _worksheetTargets[node.getAttribute('id', namespace: _relationships)]!;
     var table = tables[name] = SpreadsheetTable(name);
@@ -324,8 +345,8 @@ class XlsxDecoder extends SpreadsheetDecoder {
     file?.decompress();
 
     var content = XmlDocument.parse(utf8.decode(file?.content));
-    var worksheet = content.findElements('worksheet').first;
-    var sheet = worksheet.findElements('sheetData').first;
+    var worksheet = content.findElementsStar('worksheet').first;
+    var sheet = worksheet.findElementsStar('sheetData').first;
 
     _findRows(sheet).forEach((child) {
       _parseRow(child, table);
@@ -382,11 +403,11 @@ class XlsxDecoder extends SpreadsheetDecoder {
       // sharedString
       case 's':
         value = _sharedStrings[
-            int.parse(_parseValue(node.findElements('v').first))];
+            int.parse(_parseValue(node.findElementsStar('v').first))];
         break;
       // boolean
       case 'b':
-        value = _parseValue(node.findElements('v').first) == '1';
+        value = _parseValue(node.findElementsStar('v').first) == '1';
         break;
       // error
       case 'e':
@@ -396,20 +417,20 @@ class XlsxDecoder extends SpreadsheetDecoder {
         //  <f>CUBEVALUE("xlextdat9 Adventure Works",C$5,$A6)</f>
         //  <v>2838512.355</v>
         // </c>
-        value = _parseValue(node.findElements('v').first);
+        value = _parseValue(node.findElementsStar('v').first);
         break;
       // inline string
       case 'inlineStr':
         // <c r="B2" t="inlineStr">
         // <is><t>Hello world</t></is>
         // </c>
-        value = _parseValue(node.findAllElements('t').first);
+        value = _parseValue(node.findAllElementsStar('t').first);
         break;
       // number
       case 'n':
       default:
         var s = node.getAttribute('s');
-        var valueNode = node.findElements('v');
+        var valueNode = node.findElementsStar('v');
         var content = valueNode.first;
         if (s != null) {
           var fmtId = _numFormats[int.parse(s)];
@@ -454,10 +475,10 @@ class XlsxDecoder extends SpreadsheetDecoder {
   }
 
   static Iterable<XmlElement> _findRows(XmlElement table) =>
-      table.findElements('row');
+      table.findElementsStar('row');
 
   static Iterable<XmlElement> _findCells(XmlElement row) =>
-      row.findElements('c');
+      row.findElementsStar('c');
 
   static int _getRowNumber(XmlElement row) => int.parse(row.getAttribute('r')!);
   static void _setRowNumber(XmlElement row, int index) =>
