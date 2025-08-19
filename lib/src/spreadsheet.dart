@@ -69,9 +69,9 @@ abstract class SpreadsheetDecoder {
     return _newSpreadsheetDecoder(archive, update);
   }
 
-  factory SpreadsheetDecoder.decodeBuffer(InputStreamBase input,
+  factory SpreadsheetDecoder.decodeBuffer(InputStream input,
       {bool update = false, bool verify = false}) {
-    var archive = ZipDecoder().decodeBuffer(input, verify: verify);
+    var archive = ZipDecoder().decodeStream(input, verify: verify);
     return _newSpreadsheetDecoder(archive, update);
   }
 
@@ -188,10 +188,10 @@ abstract class SpreadsheetDecoder {
         if (_archiveFiles.containsKey(file.name)) {
           copy = _archiveFiles[file.name]!;
         } else {
-          var content = file.content as Uint8List;
-          var compress = file.compress;
-          copy = ArchiveFile(file.name, content.length, content)
-            ..compress = compress;
+          var content = file.content;
+          copy = ArchiveFile(file.name, content.length, content);
+          copy.compression = file.compression;
+          copy.compressionLevel = file.compressionLevel;
         }
         clone.addFile(copy);
       }
