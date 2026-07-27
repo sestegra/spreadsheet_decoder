@@ -13,7 +13,8 @@ String _normalizeNewLine(String text) {
   return text.replaceAll('\r\n', '\n');
 }
 
-SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive, bool update) {
+SpreadsheetDecoder _newSpreadsheetDecoder(
+    Archive archive, bool update, String dateFormat) {
   // Lookup at file format
   String? format;
 
@@ -34,9 +35,9 @@ SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive, bool update) {
 
   switch (format) {
     case _spreasheetOds:
-      return OdsDecoder(archive, update: update);
+      return OdsDecoder(archive, update: update, dateFormat: dateFormat);
     case _spreasheetXlsx:
-      return XlsxDecoder(archive, update: update);
+      return XlsxDecoder(archive, update: update, dateFormat: dateFormat);
     default:
       throw UnsupportedError('Spreadsheet format unsupported');
   }
@@ -44,7 +45,16 @@ SpreadsheetDecoder _newSpreadsheetDecoder(Archive archive, bool update) {
 
 /// Decode a spreadsheet file.
 abstract class SpreadsheetDecoder {
+  /// Default output format used for date cells when none is provided.
+  /// Format tokens follow Excel-style codes (case-insensitive):
+  /// `yyyy`/`yy`, `mm`/`m` (month — context-sensitive),
+  /// `dd`/`d`/`ddd`/`dddd`, `hh`/`h`, `ss`/`s`, `AM/PM`.
+  /// Common intl-style patterns like `dd/MM/yyyy` also work because the
+  /// pattern is matched case-insensitively.
+  static const String defaultDateFormat = 'yyyy-MM-dd';
+
   late bool _update;
+  late String _dateFormat;
   late Archive _archive;
   late Map<String, XmlElement> _sheets;
   late Map<String, XmlDocument> _xmlFiles;
@@ -63,16 +73,25 @@ abstract class SpreadsheetDecoder {
 
   SpreadsheetDecoder();
 
+  /// Decode an XLSX/ODS spreadsheet from raw [data] bytes.
+  ///
+  /// Pass [dateFormat] to control how date cells are rendered as strings
+  /// (e.g. `'dd/MM/yyyy'`, `'yyyy-MM-dd'`). Defaults to
+  /// [defaultDateFormat] (`yyyy-MM-dd`).
   factory SpreadsheetDecoder.decodeBytes(List<int> data,
-      {bool update = false, bool verify = false}) {
+      {bool update = false,
+      bool verify = false,
+      String dateFormat = defaultDateFormat}) {
     var archive = ZipDecoder().decodeBytes(data, verify: verify);
-    return _newSpreadsheetDecoder(archive, update);
+    return _newSpreadsheetDecoder(archive, update, dateFormat);
   }
 
-  factory SpreadsheetDecoder.decodeBuffer(InputStreamBase input,
-      {bool update = false, bool verify = false}) {
-    var archive = ZipDecoder().decodeBuffer(input, verify: verify);
-    return _newSpreadsheetDecoder(archive, update);
+  factory SpreadsheetDecoder.decodeBuffer(InputStream input,
+      {bool update = false,
+      bool verify = false,
+      String dateFormat = defaultDateFormat}) {
+    var archive = ZipDecoder().decodeStream(input, verify: verify);
+    return _newSpreadsheetDecoder(archive, update, dateFormat);
   }
 
   /// Dump XML content (for debug purpose)
@@ -169,7 +188,7 @@ abstract class SpreadsheetDecoder {
       var content = utf8.encode(xml);
       _archiveFiles[xmlFile] = ArchiveFile(xmlFile, content.length, content);
     }
-    return ZipEncoder().encode(_cloneArchive(_archive)) as List<int>;
+    return ZipEncoder().encode(_cloneArchive(_archive));
   }
 
   /// Encode data url
@@ -188,10 +207,10 @@ abstract class SpreadsheetDecoder {
         if (_archiveFiles.containsKey(file.name)) {
           copy = _archiveFiles[file.name]!;
         } else {
-          var content = file.content as Uint8List;
-          var compress = file.compress;
+          var content = file.content;
+          var compression = file.compression;
           copy = ArchiveFile(file.name, content.length, content)
-            ..compress = compress;
+            ..compression = compression;
         }
         clone.addFile(copy);
       }

@@ -1,3 +1,8 @@
+## Unreleased
+XLSX: decode dates with custom `<numFmt>` format codes (e.g. `dd/mm/yyyy`) using the workbook's own format code instead of leaking through as raw serial numbers. Removed the `raw` decoding mode in favour of always returning typed values.
+
+Built-in date cells (numFmtId 14-17, 22) and ODS date cells now render as `yyyy-MM-dd` by default instead of an ISO timestamp like `2008-07-21T00:00:00.000`. Added a `dateFormat` parameter to `SpreadsheetDecoder.decodeBytes` and `SpreadsheetDecoder.decodeBuffer` so callers can choose any pattern (e.g. `dd/MM/yyyy`, `yyyy.MM.dd`); custom-numFmt date cells honour the caller's `dateFormat` when explicitly set, otherwise fall back to the workbook's own format code.
+
 ## 2.3.0
 Update dependencies
 

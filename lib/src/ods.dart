@@ -19,9 +19,12 @@ class OdsDecoder extends SpreadsheetDecoder {
   String get extension => '.ods';
   final Map<String, List<String>> _styleNames = {};
 
-  OdsDecoder(Archive archive, {bool update = false}) {
+  OdsDecoder(Archive archive,
+      {bool update = false,
+      String dateFormat = SpreadsheetDecoder.defaultDateFormat}) {
     _archive = archive;
     _update = update;
+    _dateFormat = dateFormat;
     _tables = <String, SpreadsheetTable>{};
     _parseContent();
   }
@@ -96,8 +99,11 @@ class OdsDecoder extends SpreadsheetDecoder {
 
   void _parseContent() {
     var file = _archive.findFile(contentXML);
-    file?.decompress();
-    var content = XmlDocument.parse(utf8.decode(file?.content));
+    if (file == null) {
+      throw FormatException('Missing required file: $contentXML');
+    }
+    file.decompress();
+    var content = XmlDocument.parse(utf8.decode(file.content));
     if (_update == true) {
       _archiveFiles = <String, ArchiveFile>{};
       _sheets = <String, XmlElement>{};
@@ -185,6 +191,7 @@ class OdsDecoder extends SpreadsheetDecoder {
   dynamic _readCell(XmlElement node) {
     dynamic value;
     var type = node.getAttribute('office:value-type');
+
     switch (type) {
       case 'float':
       case 'percentage':
@@ -196,8 +203,9 @@ class OdsDecoder extends SpreadsheetDecoder {
             node.getAttribute('office:boolean-value')!.toLowerCase() == 'true';
         break;
       case 'date':
-        value = DateTime.parse(node.getAttribute('office:date-value')!)
-            .toIso8601String();
+        value = _formatDateTimeWithCode(
+            DateTime.parse(node.getAttribute('office:date-value')!),
+            _dateFormat);
         break;
       case 'time':
         value = node.getAttribute('office:time-value');

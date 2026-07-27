@@ -33,7 +33,9 @@ String readBase64(String filename) {
 }
 
 SpreadsheetDecoder decode(String filename, {bool update = false}) {
-  return SpreadsheetDecoder.decodeBytes(Base64Decoder().convert(readBase64(filename)), update: update);
+  return SpreadsheetDecoder.decodeBytes(
+      Base64Decoder().convert(readBase64(filename)),
+      update: update);
 }
 
 void save(String file, List<int> data) {}

@@ -92,9 +92,9 @@ var expectedFormat = <String, List<List>>{
       'Hello World',
       'One line\nTwo lines\nThree lines',
       0.124,
-      '2006-02-01T00:00:00.000',
-      '2006-02-01T13:37:00.000',
-      '2006-02-01T13:37:42.000',
+      '2006-02-01',
+      '2006-02-01',
+      '2006-02-01',
       '13:37:00',
       '13:37:42',
     ]
@@ -327,7 +327,7 @@ void testXlsx() {
       expect(decoder.tables.length, expectedNoPhonetics.keys.length);
       decoder.tables.forEach((name, table) {
         expect(table.rows, expectedNoPhonetics[name]);
-      });      
+      });
     });
   });
 }
