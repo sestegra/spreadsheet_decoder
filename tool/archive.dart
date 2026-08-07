@@ -7,9 +7,9 @@ Archive cloneArchive(Archive archive) {
   var clone = Archive();
   for (var file in archive.files) {
     if (file.isFile) {
-      var content = file.content as Uint8List;
-      var copy = ArchiveFile(file.name, content.length, content)
-        ..compress = file.compress;
+      var copy = ArchiveFile(file.name, file.content.length, file.content)
+        ..compression = file.compression
+        ..compressionLevel = file.compressionLevel;
       clone.addFile(copy);
     }
   }

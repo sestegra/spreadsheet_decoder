@@ -69,9 +69,9 @@ abstract class SpreadsheetDecoder {
     return _newSpreadsheetDecoder(archive, update);
   }
 
-  factory SpreadsheetDecoder.decodeBuffer(InputStreamBase input,
+  factory SpreadsheetDecoder.decodeBuffer(InputStream input,
       {bool update = false, bool verify = false}) {
-    var archive = ZipDecoder().decodeBuffer(input, verify: verify);
+    var archive = ZipDecoder().decodeStream(input, verify: verify);
     return _newSpreadsheetDecoder(archive, update);
   }
 
@@ -169,7 +169,7 @@ abstract class SpreadsheetDecoder {
       var content = utf8.encode(xml);
       _archiveFiles[xmlFile] = ArchiveFile(xmlFile, content.length, content);
     }
-    return ZipEncoder().encode(_cloneArchive(_archive)) as List<int>;
+    return ZipEncoder().encode(_cloneArchive(_archive));
   }
 
   /// Encode data url
@@ -188,10 +188,9 @@ abstract class SpreadsheetDecoder {
         if (_archiveFiles.containsKey(file.name)) {
           copy = _archiveFiles[file.name]!;
         } else {
-          var content = file.content as Uint8List;
-          var compress = file.compress;
-          copy = ArchiveFile(file.name, content.length, content)
-            ..compress = compress;
+          copy = ArchiveFile(file.name, file.content.length, file.content)
+            ..compression = file.compression
+            ..compressionLevel = file.compressionLevel;
         }
         clone.addFile(copy);
       }
