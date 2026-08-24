@@ -1,3 +1,9 @@
+## 4.0.0
+Update xml to 7.0.0
+
+## 3.0.0
+Update archive to 4.0.0
+
 ## 2.3.0
 Update dependencies
 

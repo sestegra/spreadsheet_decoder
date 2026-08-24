@@ -306,7 +306,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
   void _parseContent() {
     var workbook = _archive.findFile('xl/workbook.xml');
     workbook?.decompress();
-    var document = XmlDocument.parse(utf8.decode(workbook?.content));
+    var document = XmlDocument.parse(utf8.decode(workbook?.content.toList() ?? []));
     document.findAllElements('sheet').forEach((node) {
       _parseTable(node);
     });
@@ -323,7 +323,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
     var file = _archive.findFile(namePath);
     file?.decompress();
 
-    var content = XmlDocument.parse(utf8.decode(file?.content));
+    var content = XmlDocument.parse(utf8.decode(file?.content.toList() ?? []));
     var worksheet = content.findElements('worksheet').first;
     var sheet = worksheet.findElements('sheetData').first;
 
@@ -446,7 +446,7 @@ class XlsxDecoder extends SpreadsheetDecoder {
 
     for (var child in node.children) {
       if (child is XmlText) {
-        buffer.write(_normalizeNewLine(child.text));
+        buffer.write(_normalizeNewLine(child.value));
       }
     }
 
